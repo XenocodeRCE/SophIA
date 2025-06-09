@@ -9,10 +9,10 @@ from typing import Dict, List, Any, Optional, Tuple
 from datetime import datetime
 import logging
 
-from .serializer import LCMSerializer
-from ..models.lcm_core import SimpleLCM
-from ..core.ontology import SimpleOntology
-from ..training.trainer import SimpleLCMTrainer
+from sophia.storage.serializer import LCMSerializer
+from sophia.models.lcm_core import SimpleLCM
+from sophia.core.ontology import SimpleOntology
+from sophia.training.trainer import SimpleLCMTrainer
 
 logger = logging.getLogger(__name__)
 

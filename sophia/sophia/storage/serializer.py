@@ -11,9 +11,10 @@ from typing import Dict, Any, Optional, Tuple, List
 import logging
 from pathlib import Path
 
-from ..core.ontology import SimpleOntology, Concept
-from ..models.lcm_core import SimpleLCM
-from ..training.trainer import SimpleLCMTrainer, OntologyAwareLCMTrainer
+from sophia.core.ontology import SimpleOntology, Concept
+from sophia.models.lcm_core import SimpleLCM
+from sophia.training.trainer import SimpleLCMTrainer, OntologyAwareLCMTrainer
+
 
 logger = logging.getLogger(__name__)
 

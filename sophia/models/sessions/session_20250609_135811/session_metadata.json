@@ -1,0 +1,15 @@
+{
+  "session_name": "session_20250609_135811",
+  "created": "2025-06-09T13:58:44.653791",
+  "last_updated": "2025-06-09T13:58:44.653791",
+  "checkpoints_history": [
+    {
+      "epoch": 0,
+      "filepath": "models\\sessions\\session_20250609_135811\\checkpoint_epoch_0000_20250609_135844.sophia",
+      "timestamp": "2025-06-09T13:58:44.650787",
+      "metrics": {
+        "conversation_count": 0
+      }
+    }
+  ]
+}

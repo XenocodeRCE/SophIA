@@ -10,8 +10,8 @@ from dataclasses import dataclass
 import logging
 from collections import defaultdict, Counter
 
-from ..core.ontology import SimpleOntology, Concept
-from ..core.concept_types import ConceptType, RelationType
+from sophia.core.ontology import SimpleOntology, Concept
+from sophia.core.concept_types import ConceptType, RelationType
 
 logger = logging.getLogger(__name__)
 

@@ -9,9 +9,9 @@ from dataclasses import dataclass
 import logging
 from datetime import datetime
 
-from ..core.ontology import SimpleOntology, Concept
-from ..core.concept_types import ConceptType, RelationType
-from ..models.lcm_core import SimpleLCM
+from sophia.core.ontology import SimpleOntology, Concept
+from sophia.core.concept_types import ConceptType, RelationType
+from sophia.models.lcm_core import SimpleLCM
 
 logger = logging.getLogger(__name__)
 
@@ -69,11 +69,18 @@ class SimpleLCMTrainer:
                    f"{len(val_sequences)} séquences validation")
         
         for epoch in range(epochs):
+            logger.info(f"--- Début de l'époque {epoch+1}/{epochs} ---")
+            logger.debug(f"Séquences d'entraînement pour cette époque: {len(train_sequences)}")
             # Entraînement sur le batch
             train_metrics = self._train_epoch(train_sequences, epoch)
+            logger.debug(f"Résultats entraînement époque {epoch+1}: {train_metrics}")
             
             # Validation
+            if val_sequences:
+                logger.debug(f"Validation sur {len(val_sequences)} séquences")
             val_metrics = self._validate_epoch(val_sequences, epoch) if val_sequences else None
+            if val_metrics:
+                logger.debug(f"Résultats validation époque {epoch+1}: {val_metrics}")
             
             # Enregistrement des métriques
             final_metrics = self._combine_metrics(train_metrics, val_metrics, epoch)
@@ -81,6 +88,7 @@ class SimpleLCMTrainer:
             
             if verbose:
                 self._log_epoch_results(final_metrics)
+            logger.info(f"--- Fin de l'époque {epoch+1}/{epochs} ---")
         
         logger.info(f"Entraînement terminé après {epochs} époques")
         return self.training_history
@@ -92,22 +100,28 @@ class SimpleLCMTrainer:
         transitions_learned = 0
         ontological_violations = 0
         
+        logger.debug(f"Mélange des séquences pour l'époque {epoch+1}")
         # Mélange des séquences pour cet époque
         np.random.shuffle(sequences)
         
-        for sequence in sequences:
+        for idx, sequence in enumerate(sequences):
             if len(sequence) < 2:
+                logger.debug(f"Séquence {idx} ignorée (trop courte)")
                 continue
             
+            logger.debug(f"Époque {epoch+1}, séquence {idx}: {', '.join([c.name for c in sequence])}")
             # Calcul de la loss avant mise à jour
             initial_prob = self.model.evaluate_sequence_probability(sequence)
+            logger.debug(f"Probabilité initiale de la séquence: {initial_prob:.6f}")
             
             # Entraînement sur la séquence
             sequence_stats = self.model.train_on_sequences([sequence], epochs=1)
+            logger.debug(f"Stats d'entraînement sur la séquence: {sequence_stats}")
             transitions_learned += sequence_stats['total_transitions_learned']
             
             # Calcul de la loss après mise à jour
             final_prob = self.model.evaluate_sequence_probability(sequence)
+            logger.debug(f"Probabilité finale de la séquence: {final_prob:.6f}")
             
             # Loss = -log de l'amélioration de probabilité
             if final_prob > initial_prob:
@@ -115,13 +129,17 @@ class SimpleLCMTrainer:
             else:
                 loss = np.log(max(initial_prob, 1e-10) / max(final_prob, 1e-10))
             
+            logger.debug(f"Loss calculée pour la séquence: {loss:.6f}")
             total_loss += loss
             
             # Vérification des violations ontologiques
             violations = self._check_ontological_violations(sequence)
+            if violations > 0:
+                logger.debug(f"{violations} violation(s) ontologique(s) détectée(s) dans la séquence")
             ontological_violations += violations
         
         avg_loss = total_loss / max(len(sequences), 1)
+        logger.info(f"Époque {epoch+1}: loss moyenne={avg_loss:.6f}, transitions apprises={transitions_learned}, violations ontologiques={ontological_violations}")
         
         return {
             'loss': avg_loss,
@@ -134,25 +152,29 @@ class SimpleLCMTrainer:
         """Validation sur un ensemble de séquences"""
         
         if not val_sequences:
+            logger.warning("Aucune séquence de validation fournie")
             return {}
         
         total_prob = 0.0
         coherence_scores = []
         
-        for sequence in val_sequences:
+        for idx, sequence in enumerate(val_sequences):
             if len(sequence) < 2:
+                logger.debug(f"Séquence de validation {idx} ignorée (trop courte)")
                 continue
             
-            # Probabilité de la séquence selon le modèle actuel
             prob = self.model.evaluate_sequence_probability(sequence)
+            logger.debug(f"Validation époque {epoch+1}, séquence {idx}: probabilité={prob:.6f}")
             total_prob += prob
             
-            # Score de cohérence ontologique
             coherence = self._calculate_coherence_score(sequence)
+            logger.debug(f"Score de cohérence pour la séquence {idx}: {coherence:.4f}")
             coherence_scores.append(coherence)
         
         avg_probability = total_prob / max(len(val_sequences), 1)
         avg_coherence = np.mean(coherence_scores) if coherence_scores else 0.0
+        
+        logger.info(f"Validation époque {epoch+1}: probabilité moyenne={avg_probability:.6f}, cohérence moyenne={avg_coherence:.4f}")
         
         return {
             'validation_probability': avg_probability,
@@ -202,16 +224,19 @@ class SimpleLCMTrainer:
                         RelationType.CONTRADICTS.value: -1.0,  # Pénalité
                         RelationType.OPPOSES.value: -0.5
                     }
+                    logger.debug(f"Relation {relation_type} trouvée entre {current.name} et {next_concept.name}, poids={weights.get(relation_type, 0.3)}")
                     coherence_points += weights.get(relation_type, 0.3)
             
             # Points pour types de concepts compatibles
             if self._are_concept_types_compatible(current.concept_type, next_concept.concept_type):
+                logger.debug(f"Types compatibles: {current.concept_type} -> {next_concept.concept_type}")
                 coherence_points += 0.2
         
         # Normalisation
         max_possible_score = total_transitions * 1.2  # Maximum théorique
         coherence_score = max(0, coherence_points) / max(max_possible_score, 1)
         
+        logger.debug(f"Score de cohérence normalisé: {coherence_score:.4f}")
         return min(1.0, coherence_score)
     
     def _are_concept_types_compatible(self, type1: ConceptType, type2: ConceptType) -> bool:

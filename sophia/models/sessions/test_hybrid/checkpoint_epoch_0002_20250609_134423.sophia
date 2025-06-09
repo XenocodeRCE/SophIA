@@ -1,0 +1,633 @@
+{
+  "version": "1.0",
+  "timestamp": "2025-06-09T13:44:23.790429",
+  "model_name": "checkpoint_epoch_0002",
+  "metadata": {
+    "session_name": "test_hybrid",
+    "epoch": 2,
+    "timestamp": "2025-06-09T13:44:23.790429",
+    "metrics": {
+      "conversation_count": 2
+    },
+    "is_checkpoint": true
+  },
+  "ontology": {
+    "metadata": {
+      "version": "1.0",
+      "creation_date": "2025-06-09T13:43:29.364660",
+      "last_modified": "2025-06-09T13:44:23.790429",
+      "total_concepts": 40,
+      "total_relations": 18
+    },
+    "concepts": {
+      "ÊTRE": {
+        "name": "ÊTRE",
+        "concept_type": "entity",
+        "domain": null,
+        "relations": {
+          "is_a": [
+            "EXISTENCE"
+          ]
+        },
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "EXISTENCE": {
+        "name": "EXISTENCE",
+        "concept_type": "entity",
+        "domain": null,
+        "relations": {
+          "implies": [
+            "ÊTRE"
+          ],
+          "has_property": [
+            "ÊTRE"
+          ]
+        },
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "ESSENCE": {
+        "name": "ESSENCE",
+        "concept_type": "property",
+        "domain": null,
+        "relations": {
+          "defines": [
+            "ÊTRE"
+          ]
+        },
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "SUBSTANCE": {
+        "name": "SUBSTANCE",
+        "concept_type": "entity",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "ACCIDENT": {
+        "name": "ACCIDENT",
+        "concept_type": "property",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "NÉCESSITÉ": {
+        "name": "NÉCESSITÉ",
+        "concept_type": "property",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "POSSIBILITÉ": {
+        "name": "POSSIBILITÉ",
+        "concept_type": "property",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "ACTUALITÉ": {
+        "name": "ACTUALITÉ",
+        "concept_type": "property",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "VÉRITÉ": {
+        "name": "VÉRITÉ",
+        "concept_type": "epistemic",
+        "domain": null,
+        "relations": {
+          "opposes": [
+            "FAUSSETÉ"
+          ],
+          "is_a": [
+            "CONNAISSANCE"
+          ]
+        },
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "CONNAISSANCE": {
+        "name": "CONNAISSANCE",
+        "concept_type": "epistemic",
+        "domain": null,
+        "relations": {
+          "implies": [
+            "VÉRITÉ"
+          ],
+          "has_property": [
+            "VÉRITÉ"
+          ]
+        },
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "CROYANCE": {
+        "name": "CROYANCE",
+        "concept_type": "epistemic",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "OPINION": {
+        "name": "OPINION",
+        "concept_type": "epistemic",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "DOUTE": {
+        "name": "DOUTE",
+        "concept_type": "epistemic",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "CERTITUDE": {
+        "name": "CERTITUDE",
+        "concept_type": "epistemic",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "ÉVIDENCE": {
+        "name": "ÉVIDENCE",
+        "concept_type": "epistemic",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "ARGUMENT": {
+        "name": "ARGUMENT",
+        "concept_type": "logical",
+        "domain": null,
+        "relations": {
+          "has_property": [
+            "VALIDITÉ"
+          ]
+        },
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "PRÉMISSE": {
+        "name": "PRÉMISSE",
+        "concept_type": "logical",
+        "domain": null,
+        "relations": {
+          "enables": [
+            "CONCLUSION"
+          ]
+        },
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "CONCLUSION": {
+        "name": "CONCLUSION",
+        "concept_type": "logical",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "VALIDITÉ": {
+        "name": "VALIDITÉ",
+        "concept_type": "logical",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "SOLIDITÉ": {
+        "name": "SOLIDITÉ",
+        "concept_type": "logical",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "CONTRADICTION": {
+        "name": "CONTRADICTION",
+        "concept_type": "logical",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "COHÉRENCE": {
+        "name": "COHÉRENCE",
+        "concept_type": "logical",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "BIEN": {
+        "name": "BIEN",
+        "concept_type": "moral",
+        "domain": null,
+        "relations": {
+          "opposes": [
+            "MAL"
+          ],
+          "has_property": [
+            "JUSTICE"
+          ]
+        },
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "MAL": {
+        "name": "MAL",
+        "concept_type": "moral",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "JUSTICE": {
+        "name": "JUSTICE",
+        "concept_type": "moral",
+        "domain": null,
+        "relations": {
+          "is_a": [
+            "BIEN"
+          ],
+          "opposes": [
+            "INJUSTICE"
+          ]
+        },
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "INJUSTICE": {
+        "name": "INJUSTICE",
+        "concept_type": "moral",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "VERTU": {
+        "name": "VERTU",
+        "concept_type": "value",
+        "domain": null,
+        "relations": {
+          "enables": [
+            "BIEN"
+          ]
+        },
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "VICE": {
+        "name": "VICE",
+        "concept_type": "value",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "DEVOIR": {
+        "name": "DEVOIR",
+        "concept_type": "moral",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "DROIT": {
+        "name": "DROIT",
+        "concept_type": "moral",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "RESPONSABILITÉ": {
+        "name": "RESPONSABILITÉ",
+        "concept_type": "moral",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "LIBERTÉ": {
+        "name": "LIBERTÉ",
+        "concept_type": "value",
+        "domain": null,
+        "relations": {
+          "enables": [
+            "RESPONSABILITÉ"
+          ]
+        },
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "BEAUTÉ": {
+        "name": "BEAUTÉ",
+        "concept_type": "aesthetic",
+        "domain": null,
+        "relations": {
+          "is_a": [
+            "VALEUR"
+          ]
+        },
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "LAIDEUR": {
+        "name": "LAIDEUR",
+        "concept_type": "aesthetic",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "ART": {
+        "name": "ART",
+        "concept_type": "aesthetic",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "GOÛT": {
+        "name": "GOÛT",
+        "concept_type": "aesthetic",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "SUBLIME": {
+        "name": "SUBLIME",
+        "concept_type": "aesthetic",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "FAUSSETÉ": {
+        "name": "FAUSSETÉ",
+        "concept_type": "epistemic",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "VALEUR": {
+        "name": "VALEUR",
+        "concept_type": "value",
+        "domain": null,
+        "relations": {
+          "has_property": [
+            "BEAUTÉ"
+          ]
+        },
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      },
+      "CONCEPT": {
+        "name": "CONCEPT",
+        "concept_type": "entity",
+        "domain": null,
+        "relations": {},
+        "properties": {},
+        "definitions": [],
+        "examples": [],
+        "learning_weight": 1.0,
+        "last_updated": null,
+        "source": "core"
+      }
+    }
+  },
+  "model": {
+    "model_type": "SimpleLCM",
+    "learning_rate": 0.1,
+    "model_state": {
+      "transitions": {
+        "VÉRITÉ->FAUSSETÉ": {
+          "from_concept": "VÉRITÉ",
+          "to_concept": "FAUSSETÉ",
+          "weight": 0.43897600000000003,
+          "relation_type": null,
+          "context": null,
+          "frequency": 1
+        }
+      },
+      "learning_rate": 0.1,
+      "total_sequences_seen": 1,
+      "training_history": [
+        {
+          "total_transitions_learned": 1,
+          "unique_transitions": 1,
+          "sequences_processed": 1,
+          "epochs": 1,
+          "average_transitions_per_sequence": 1.0
+        }
+      ]
+    },
+    "model_stats": {
+      "total_transitions": 1,
+      "concepts_with_outgoing_transitions": 1,
+      "concepts_with_incoming_transitions": 1,
+      "coverage_ratio": 0.025,
+      "total_sequences_seen": 1,
+      "training_epochs": 1
+    }
+  },
+  "trainer": {
+    "trainer_type": "OntologyAwareLCMTrainer",
+    "learning_rate": 0.1,
+    "batch_size": 32,
+    "validation_split": 0.2,
+    "training_summary": {
+      "total_epochs": 3,
+      "final_loss": 0.0,
+      "best_loss": -23.025850929940457,
+      "final_coherence": 0.12500000000000003,
+      "best_coherence": 0.33333333333333337,
+      "total_violations": 0,
+      "total_transitions_learned": 1,
+      "improvement": {
+        "loss_reduction": -23.025850929940457,
+        "coherence_improvement": -0.08333333333333331
+      }
+    },
+    "consistency_weight": 0.3,
+    "ontological_constraints_count": 40
+  },
+  "save_stats": {
+    "concepts_count": 40,
+    "transitions_count": 1,
+    "training_epochs": 3
+  }
+}

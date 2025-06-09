@@ -67,7 +67,7 @@ class OllamaLLaMAInterface:
             logger.error(f"Erreur vérification modèle: {e}")
             return False
     
-    def generate_text(self, prompt: str, max_tokens: int = 256, 
+    def generate_text(self, prompt: str, max_tokens: int = 2048, 
                      temperature: float = 0.7, stream: bool = False) -> str:
         """Génère du texte à partir d'un prompt via Ollama"""
         
@@ -83,7 +83,8 @@ class OllamaLLaMAInterface:
                     "temperature": temperature,
                     "num_predict": max_tokens,
                     "top_p": 0.9,
-                    "repeat_penalty": 1.1
+                    "repeat_penalty": 1.1,
+                    "stop": []  # ← Pas de mots d'arrêt prématuré
                 }
             }
             
@@ -322,7 +323,7 @@ Réponds de manière naturelle et philosophiquement cohérente en respectant tou
     
     def _build_constraint_instructions(self, constraints: Dict[str, Any]) -> str:
         """Construit les instructions de contraintes pour le prompt"""
-        
+    
         instructions = []
         
         if 'required_concepts' in constraints:
@@ -335,14 +336,17 @@ Réponds de manière naturelle et philosophiquement cohérente en respectant tou
         
         if 'required_relations' in constraints:
             for relation in constraints['required_relations']:
+                relation_type = relation.get('relation', relation.get('type', 'IMPLIES'))
                 instructions.append(
-                    f"• Établis cette relation: {relation['from']} {relation['type']} {relation['to']}"
+                    f"• Établis cette relation: {relation['from']} {relation_type} {relation['to']}"
                 )
         
         if 'forbidden_relations' in constraints:
             for relation in constraints['forbidden_relations']:
+                # Correction : utilise 'relation' au lieu de 'type'
+                relation_type = relation.get('relation', relation.get('type', 'CONTRADICTS'))
                 instructions.append(
-                    f"• N'établis JAMAIS: {relation['from']} {relation['type']} {relation['to']}"
+                    f"• N'établis JAMAIS: {relation['from']} {relation_type} {relation['to']}"
                 )
         
         if 'tone' in constraints:
@@ -352,7 +356,7 @@ Réponds de manière naturelle et philosophiquement cohérente en respectant tou
     
     def _check_constraints_satisfaction(self, text: str, constraints: Dict[str, Any]) -> Dict[str, Any]:
         """Vérifie si un texte satisfait les contraintes données"""
-        
+    
         text_upper = text.upper()
         failed_constraints = []
         satisfied = True
@@ -378,6 +382,9 @@ Réponds de manière naturelle et philosophiquement cohérente en respectant tou
             
             if found_forbidden:
                 failed_constraints.append(f"Concepts interdits trouvés: {found_forbidden}")
+        
+        # Note: Validation des relations simplifiée pour éviter les erreurs
+        # TODO: Implémenter validation sémantique des relations
         
         return {
             'satisfied': satisfied,

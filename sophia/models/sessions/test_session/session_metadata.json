@@ -1,7 +1,7 @@
 {
   "session_name": "test_session",
-  "created": "2025-06-09T12:53:43.229169",
-  "last_updated": "2025-06-09T12:53:43.229169",
+  "created": "2025-06-09T13:43:04.268067",
+  "last_updated": "2025-06-09T13:43:04.268067",
   "checkpoints_history": [
     {
       "epoch": 1,
@@ -52,6 +52,78 @@
       "epoch": 2,
       "filepath": "models\\sessions\\test_session\\checkpoint_epoch_0002_20250609_125343.sophia",
       "timestamp": "2025-06-09T12:53:43.226170",
+      "metrics": {
+        "loss": 0.3,
+        "coherence": 0.9
+      }
+    },
+    {
+      "epoch": 1,
+      "filepath": "models\\sessions\\test_session\\checkpoint_epoch_0001_20250609_125639.sophia",
+      "timestamp": "2025-06-09T12:56:39.599073",
+      "metrics": {
+        "loss": 0.5,
+        "coherence": 0.8
+      }
+    },
+    {
+      "epoch": 2,
+      "filepath": "models\\sessions\\test_session\\checkpoint_epoch_0002_20250609_125639.sophia",
+      "timestamp": "2025-06-09T12:56:39.611572",
+      "metrics": {
+        "loss": 0.3,
+        "coherence": 0.9
+      }
+    },
+    {
+      "epoch": 1,
+      "filepath": "models\\sessions\\test_session\\checkpoint_epoch_0001_20250609_130004.sophia",
+      "timestamp": "2025-06-09T13:00:04.827849",
+      "metrics": {
+        "loss": 0.5,
+        "coherence": 0.8
+      }
+    },
+    {
+      "epoch": 2,
+      "filepath": "models\\sessions\\test_session\\checkpoint_epoch_0002_20250609_130004.sophia",
+      "timestamp": "2025-06-09T13:00:04.838859",
+      "metrics": {
+        "loss": 0.3,
+        "coherence": 0.9
+      }
+    },
+    {
+      "epoch": 1,
+      "filepath": "models\\sessions\\test_session\\checkpoint_epoch_0001_20250609_132010.sophia",
+      "timestamp": "2025-06-09T13:20:10.277574",
+      "metrics": {
+        "loss": 0.5,
+        "coherence": 0.8
+      }
+    },
+    {
+      "epoch": 2,
+      "filepath": "models\\sessions\\test_session\\checkpoint_epoch_0002_20250609_132010.sophia",
+      "timestamp": "2025-06-09T13:20:10.281074",
+      "metrics": {
+        "loss": 0.3,
+        "coherence": 0.9
+      }
+    },
+    {
+      "epoch": 1,
+      "filepath": "models\\sessions\\test_session\\checkpoint_epoch_0001_20250609_134304.sophia",
+      "timestamp": "2025-06-09T13:43:04.261071",
+      "metrics": {
+        "loss": 0.5,
+        "coherence": 0.8
+      }
+    },
+    {
+      "epoch": 2,
+      "filepath": "models\\sessions\\test_session\\checkpoint_epoch_0002_20250609_134304.sophia",
+      "timestamp": "2025-06-09T13:43:04.265068",
       "metrics": {
         "loss": 0.3,
         "coherence": 0.9

@@ -1,0 +1,71 @@
+{
+  "session_name": "test_hybrid",
+  "created": "2025-06-09T13:44:36.724117",
+  "last_updated": "2025-06-09T13:44:36.724117",
+  "checkpoints_history": [
+    {
+      "epoch": 0,
+      "filepath": "models\\sessions\\test_hybrid\\checkpoint_epoch_0000_20250609_130042.sophia",
+      "timestamp": "2025-06-09T13:00:42.311504",
+      "metrics": {
+        "conversation_count": 0
+      }
+    },
+    {
+      "epoch": 1,
+      "filepath": "models\\sessions\\test_hybrid\\checkpoint_epoch_0001_20250609_130057.sophia",
+      "timestamp": "2025-06-09T13:00:57.196005",
+      "metrics": {
+        "conversation_count": 1
+      }
+    },
+    {
+      "epoch": 2,
+      "filepath": "models\\sessions\\test_hybrid\\checkpoint_epoch_0002_20250609_130108.sophia",
+      "timestamp": "2025-06-09T13:01:08.235992",
+      "metrics": {
+        "conversation_count": 2
+      }
+    },
+    {
+      "epoch": 3,
+      "filepath": "models\\sessions\\test_hybrid\\checkpoint_epoch_0003_20250609_130119.sophia",
+      "timestamp": "2025-06-09T13:01:19.323663",
+      "metrics": {
+        "conversation_count": 3
+      }
+    },
+    {
+      "epoch": 0,
+      "filepath": "models\\sessions\\test_hybrid\\checkpoint_epoch_0000_20250609_134350.sophia",
+      "timestamp": "2025-06-09T13:43:50.648544",
+      "metrics": {
+        "conversation_count": 0
+      }
+    },
+    {
+      "epoch": 1,
+      "filepath": "models\\sessions\\test_hybrid\\checkpoint_epoch_0001_20250609_134409.sophia",
+      "timestamp": "2025-06-09T13:44:09.037677",
+      "metrics": {
+        "conversation_count": 1
+      }
+    },
+    {
+      "epoch": 2,
+      "filepath": "models\\sessions\\test_hybrid\\checkpoint_epoch_0002_20250609_134423.sophia",
+      "timestamp": "2025-06-09T13:44:23.790429",
+      "metrics": {
+        "conversation_count": 2
+      }
+    },
+    {
+      "epoch": 3,
+      "filepath": "models\\sessions\\test_hybrid\\checkpoint_epoch_0003_20250609_134436.sophia",
+      "timestamp": "2025-06-09T13:44:36.721605",
+      "metrics": {
+        "conversation_count": 3
+      }
+    }
+  ]
+}
