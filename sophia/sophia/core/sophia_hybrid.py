@@ -1,5 +1,5 @@
 """
-Système hybride SophIA : LCM + LLaMA
+Système hybride SophIA : LCM + LLaMA avec modules avancés
 Combinaison du raisonnement conceptuel et de la génération naturelle
 """
 
@@ -13,27 +13,37 @@ from sophia.models.lcm_core import SimpleLCM
 from sophia.training.trainer import OntologyAwareLCMTrainer
 from sophia.llm.llama_interface import OllamaLLaMAInterface
 from sophia.storage.session import TrainingSession
+from sophia.bridge.concept_text_bridge import EnhancedConceptTextBridge
+from sophia.constraints.constraint_manager import PhilosophicalConstraintManager
 
 logger = logging.getLogger(__name__)
 
-class ConceptualResponse:
-    """Représente une réponse de SophIA avec trace de raisonnement"""
+class SophIAResponse:
+    """Représente une réponse complète de SophIA avec tous les métadonnées"""
     
     def __init__(self, question: str, natural_response: str, 
-                 conceptual_analysis: Dict[str, Any], metadata: Dict[str, Any]):
+                 conceptual_analysis: Dict[str, Any], 
+                 lcm_reasoning: Dict[str, Any],
+                 confidence: float,
+                 timestamp: datetime,
+                 validation_report: Optional[Dict[str, Any]] = None):
         self.question = question
         self.natural_response = natural_response
         self.conceptual_analysis = conceptual_analysis
-        self.metadata = metadata
-        self.timestamp = datetime.now().isoformat()
+        self.lcm_reasoning = lcm_reasoning
+        self.confidence = confidence
+        self.timestamp = timestamp
+        self.validation_report = validation_report or {}
     
     def to_dict(self) -> Dict[str, Any]:
         return {
             'question': self.question,
             'natural_response': self.natural_response,
             'conceptual_analysis': self.conceptual_analysis,
-            'metadata': self.metadata,
-            'timestamp': self.timestamp
+            'lcm_reasoning': self.lcm_reasoning,
+            'confidence': self.confidence,
+            'timestamp': self.timestamp.isoformat(),
+            'validation_report': self.validation_report
         }
 
 class HybridSophIA:
@@ -41,6 +51,8 @@ class HybridSophIA:
     Système hybride SophIA combinant :
     - Raisonnement conceptuel (LCM)
     - Génération naturelle (LLaMA)
+    - Pont conceptuel avancé
+    - Validation par contraintes
     - Apprentissage continu
     """
     
@@ -57,17 +69,21 @@ class HybridSophIA:
         self.trainer = OntologyAwareLCMTrainer(self.lcm_model, self.ontology)
         self.llm = OllamaLLaMAInterface(model_name=llm_model)
         
+        # Modules avancés
+        self.concept_bridge = EnhancedConceptTextBridge(self.ontology, self.llm)
+        self.constraint_manager = PhilosophicalConstraintManager(self.ontology, self.llm)
+        
         # Système de session pour persistance
         self.session = TrainingSession(session_name) if auto_save else None
         
         # Historique conversationnel
-        self.conversation_history: List[ConceptualResponse] = []
+        self.conversation_history: List[SophIAResponse] = []
         self.learning_buffer: List[Dict[str, Any]] = []
         
         # Paramètres de fonctionnement
         self.response_temperature = 0.7
-        self.conceptual_weight = 0.6  # Poids du raisonnement conceptuel vs génération libre
-        self.learning_threshold = 0.3  # Seuil pour apprentissage automatique
+        self.conceptual_weight = 0.6
+        self.learning_threshold = 0.3
         
         logger.info(f"SophIA Hybride initialisée : session '{session_name}'")
         self._log_system_status()
@@ -79,102 +95,127 @@ class HybridSophIA:
         logger.info(f"LCM: {len(self.lcm_model.transitions)} transitions")
         logger.info(f"LLaMA: {llm_info['status']} ({llm_info['model_name']})")
     
-    def ask(self, question: str, context: Optional[str] = None) -> ConceptualResponse:
+    def ask(self, question: str, context: Optional[str] = None) -> SophIAResponse:
         """Interface principale pour poser une question à SophIA"""
         
         logger.info(f"Question reçue: {question}")
         
-        # Phase 1: Analyse conceptuelle
-        conceptual_analysis = self._analyze_question_conceptually(question, context)
+        # Phase 1: Analyse conceptuelle enrichie
+        conceptual_analysis = self._extract_concepts_from_question(question)
         
-        # Phase 2: Génération hybride
+        # Phase 2: Raisonnement LCM
+        lcm_reasoning = self._generate_lcm_reasoning(conceptual_analysis)
+        
+        # Phase 3: Génération hybride
         natural_response = self._generate_hybrid_response(question, conceptual_analysis, context)
         
-        # Phase 3: Construction de la réponse complète
-        metadata = {
-            'reasoning_method': 'hybrid',
-            'conceptual_confidence': conceptual_analysis.get('confidence', 0.5),
-            'llm_status': self.llm.get_model_info()['status'],
-            'concepts_involved': conceptual_analysis.get('concepts_detected', []),
-            'learning_triggered': False
+        # Phase 4: Validation par contraintes
+        validation_context = {
+            **conceptual_analysis,
+            'question': question,
+            'context': context
         }
+        validation_report = self._validate_and_improve_response(natural_response, validation_context)
         
-        response = ConceptualResponse(question, natural_response, conceptual_analysis, metadata)
+        # Phase 5: Calcul de confiance globale
+        confidence = self._calculate_global_confidence(conceptual_analysis, validation_report)
         
-        # Phase 4: Apprentissage automatique
+        # Phase 6: Construction de la réponse complète
+        response = SophIAResponse(
+            question=question,
+            natural_response=natural_response,
+            conceptual_analysis=conceptual_analysis,
+            lcm_reasoning=lcm_reasoning,
+            confidence=confidence,
+            timestamp=datetime.now(),
+            validation_report=validation_report
+        )
+        
+        # Phase 7: Apprentissage automatique
         if self._should_learn_from_interaction(response):
             self._learn_from_interaction(response)
-            response.metadata['learning_triggered'] = True
         
-        # Phase 5: Sauvegarde dans l'historique
+        # Phase 8: Sauvegarde dans l'historique
         self.conversation_history.append(response)
         
         return response
     
-    def _analyze_question_conceptually(self, question: str, context: Optional[str] = None) -> Dict[str, Any]:
-        """Analyse conceptuelle de la question via LCM et extraction LLaMA"""
+    def _extract_concepts_from_question(self, question: str) -> Dict[str, Any]:
+        """Extrait les concepts philosophiques avec analyse améliorée"""
         
-        # Extraction des concepts via LLaMA
-        available_concepts = list(self.ontology.concepts.keys())
+        # Extraction de base
+        base_extraction = self.llm.extract_concepts_from_text(
+            question, list(self.ontology.concepts.keys())
+        )
         
-        # Texte à analyser (question + contexte éventuel)
-        analysis_text = question
-        if context:
-            analysis_text = f"{context} {question}"
+        # Amélioration avec le bridge
+        enhanced_extraction = self.concept_bridge.enhanced_concept_extraction(
+            question, base_extraction
+        )
         
-        llm_extraction = self.llm.extract_concepts_from_text(analysis_text, available_concepts)
+        # Log des améliorations
+        base_concepts = set(base_extraction.get('concepts_detected', []))
+        enhanced_concepts = set(enhanced_extraction.get('concepts_detected', []))
+        new_concepts = enhanced_concepts - base_concepts
         
-        # Analyse LCM des concepts détectés
-        detected_concepts = llm_extraction['concepts_detected']
-        conceptual_paths = []
+        if new_concepts:
+            logger.info(f"🔍 Bridge a trouvé de nouveaux concepts: {new_concepts}")
+        
+        return enhanced_extraction
+    
+    def _generate_lcm_reasoning(self, conceptual_analysis: Dict[str, Any]) -> Dict[str, Any]:
+        """Génère un raisonnement LCM basé sur l'analyse conceptuelle"""
+        
+        detected_concepts = conceptual_analysis.get('concepts_detected', [])
+        reasoning_paths = []
         
         if detected_concepts:
-            # Génération de chemins conceptuels pour chaque concept détecté
-            for concept_name in detected_concepts[:3]:  # Limite à 3 concepts principaux
+            for concept_name in detected_concepts[:3]:
                 if concept_name in self.ontology.concepts:
-                    # Génération d'une séquence conceptuelle
-                    sequence = self.lcm_model.generate_sequence(concept_name, length=4, temperature=0.8)
-                    conceptual_paths.append({
-                        'start_concept': concept_name,
-                        'reasoning_path': [c.name for c in sequence],
-                        'path_probability': self.lcm_model.evaluate_sequence_probability(sequence)
-                    })
+                    try:
+                        sequence = self.lcm_model.generate_sequence(
+                            concept_name, length=4, temperature=0.8
+                        )
+                        if sequence:
+                            reasoning_paths.append({
+                                'start_concept': concept_name,
+                                'reasoning_path': [c.name for c in sequence],
+                                'path_probability': self.lcm_model.evaluate_sequence_probability(sequence)
+                            })
+                    except Exception as e:
+                        logger.warning(f"Erreur génération séquence pour {concept_name}: {e}")
         
         return {
-            'concepts_detected': detected_concepts,
-            'relations_implied': llm_extraction['relations_implied'],
-            'conceptual_paths': conceptual_paths,
-            'confidence': llm_extraction['confidence'],
-            'analysis_method': 'llm_extraction + lcm_reasoning'
+            'reasoning_paths': reasoning_paths,
+            'total_paths': len(reasoning_paths),
+            'reasoning_confidence': sum(p['path_probability'] for p in reasoning_paths) / max(len(reasoning_paths), 1)
         }
     
     def _generate_hybrid_response(self, question: str, conceptual_analysis: Dict[str, Any], 
                                 context: Optional[str] = None) -> str:
         """Génère une réponse hybride combinant raisonnement LCM et génération LLaMA"""
         
-        # Construction du prompt enrichi conceptuellement
         enriched_prompt = self._build_conceptually_enriched_prompt(
             question, conceptual_analysis, context
         )
         
-        # Contraintes basées sur l'analyse conceptuelle
         constraints = self._build_conceptual_constraints(conceptual_analysis)
         
-        # Génération contrainte via LLaMA
         if constraints and conceptual_analysis['confidence'] > self.learning_threshold:
-            # Mode contraint si bonne confiance conceptuelle
-            generation_result = self.llm.generate_with_constraints(
-                enriched_prompt, constraints, max_attempts=2
-            )
-            response = generation_result['text']
-            
-            # Fallback si contraintes non respectées
-            if not generation_result['constraints_satisfied']:
-                logger.warning("Contraintes non respectées, génération libre")
-                response = self.llm.generate_text(enriched_prompt, max_tokens=200)
+            try:
+                generation_result = self.llm.generate_with_constraints(
+                    enriched_prompt, constraints, max_attempts=2
+                )
+                response = generation_result['text']
+                
+                if not generation_result['constraints_satisfied']:
+                    logger.warning("Contraintes non respectées, génération libre")
+                    response = self.llm.generate_text(enriched_prompt, max_tokens=600)
+            except Exception as e:
+                logger.warning(f"Erreur génération contrainte: {e}")
+                response = self.llm.generate_text(enriched_prompt, max_tokens=600)
         else:
-            # Mode génération libre si faible confiance conceptuelle
-            response = self.llm.generate_text(enriched_prompt, max_tokens=200)
+            response = self.llm.generate_text(enriched_prompt, max_tokens=600)
         
         return response
     
@@ -190,7 +231,6 @@ QUESTION: {question}"""
         if context:
             base_prompt += f"\nCONTEXTE: {context}"
         
-        # Enrichissement conceptuel
         detected_concepts = conceptual_analysis.get('concepts_detected', [])
         conceptual_paths = conceptual_analysis.get('conceptual_paths', [])
         
@@ -199,15 +239,14 @@ QUESTION: {question}"""
         
         if conceptual_paths:
             base_prompt += "\n\nCHEMINS DE RAISONNEMENT CONCEPTUEL:"
-            for i, path in enumerate(conceptual_paths[:2], 1):  # Limite à 2 chemins
+            for i, path in enumerate(conceptual_paths[:2], 1):
                 path_str = " → ".join(path['reasoning_path'])
                 base_prompt += f"\n{i}. {path_str}"
         
-        # Relations détectées
         relations = conceptual_analysis.get('relations_implied', [])
         if relations:
             base_prompt += "\n\nRELATIONS CONCEPTUELLES:"
-            for relation in relations[:3]:  # Limite à 3 relations
+            for relation in relations[:3]:
                 base_prompt += f"\n- {relation['from']} {relation['relation']} {relation['to']}"
         
         base_prompt += "\n\nRéponds en intégrant ces éléments conceptuels de manière naturelle et philosophiquement rigoureuse."
@@ -221,50 +260,71 @@ QUESTION: {question}"""
         
         detected_concepts = conceptual_analysis.get('concepts_detected', [])
         if detected_concepts:
-            # Exigence d'utiliser les concepts principaux
             constraints['required_concepts'] = detected_concepts[:3]
         
         relations = conceptual_analysis.get('relations_implied', [])
         if relations:
-            # Normalisation des relations pour éviter les erreurs de clé
             normalized_relations = []
-            for relation in relations[:2]:  # Limite à 2 relations
+            for relation in relations[:2]:
                 normalized_relation = {
                     'from': relation.get('from', ''),
                     'to': relation.get('to', ''),
-                    'relation': relation.get('relation', relation.get('type', 'IMPLIES'))  # Support des deux formats
+                    'relation': relation.get('relation', relation.get('type', 'IMPLIES'))
                 }
                 normalized_relations.append(normalized_relation)
             
             constraints['required_relations'] = normalized_relations
         
-        # Contraintes de style
         constraints.update({
             'tone': 'philosophique et analytique',
-            'max_tokens': 2048
+            'max_tokens': 600
         })
         
         return constraints
     
-    def _should_learn_from_interaction(self, response: ConceptualResponse) -> bool:
+    def _validate_and_improve_response(self, response: str, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Valide et améliore la réponse selon les contraintes philosophiques"""
+        
+        validation_report = self.constraint_manager.validate_response(response, context)
+        
+        logger.info(f"📊 Score de validation: {validation_report['global_score']:.2f}")
+        
+        if not validation_report['is_valid']:
+            logger.warning(f"⚠️ Violations: {len(validation_report['violations'])}")
+            for violation in validation_report['violations']:
+                logger.warning(f"  - {violation['constraint']}: {violation['score']:.2f}")
+        
+        return validation_report
+    
+    def _calculate_global_confidence(self, conceptual_analysis: Dict[str, Any], 
+                                   validation_report: Dict[str, Any]) -> float:
+        """Calcule la confiance globale de la réponse"""
+        
+        concept_confidence = conceptual_analysis.get('enhanced_confidence', 
+                                                   conceptual_analysis.get('confidence', 0.5))
+        validation_confidence = validation_report.get('global_score', 0.5)
+        
+        # Moyenne pondérée
+        global_confidence = (concept_confidence * 0.6) + (validation_confidence * 0.4)
+        
+        return min(global_confidence, 1.0)
+    
+    def _should_learn_from_interaction(self, response: SophIAResponse) -> bool:
         """Détermine si SophIA doit apprendre de cette interaction"""
         
-        # Critères d'apprentissage
         criteria = {
             'new_concepts_detected': len(response.conceptual_analysis.get('concepts_detected', [])) > 0,
-            'high_confidence': response.conceptual_analysis.get('confidence', 0) > self.learning_threshold,
+            'high_confidence': response.confidence > self.learning_threshold,
             'sufficient_response_length': len(response.natural_response) > 50,
-            'contains_relations': len(response.conceptual_analysis.get('relations_implied', [])) > 0
+            'good_validation': response.validation_report.get('global_score', 0) > 0.6
         }
         
-        # Apprentissage si au moins 2 critères sont remplis
         return sum(criteria.values()) >= 2
     
-    def _learn_from_interaction(self, response: ConceptualResponse):
+    def _learn_from_interaction(self, response: SophIAResponse):
         """Apprend de l'interaction pour améliorer le modèle"""
         
-        # Extraction des séquences conceptuelles pour l'entraînement
-        conceptual_paths = response.conceptual_analysis.get('conceptual_paths', [])
+        conceptual_paths = response.lcm_reasoning.get('reasoning_paths', [])
         
         training_sequences = []
         for path in conceptual_paths:
@@ -279,31 +339,11 @@ QUESTION: {question}"""
             if len(sequence_concepts) >= 2:
                 training_sequences.append(sequence_concepts)
         
-        # Entraînement incrémental
         if training_sequences:
             self.trainer.train(training_sequences, epochs=1, verbose=False)
             logger.debug(f"Apprentissage: {len(training_sequences)} séquences intégrées")
         
-        # Intégration des nouvelles relations
-        relations = response.conceptual_analysis.get('relations_implied', [])
-        for relation in relations:
-            from_concept = relation['from']
-            to_concept = relation['to']
-            relation_type = relation['relation']
-            
-            # Ajout à l'ontologie si concepts valides
-            if (from_concept in self.ontology.concepts and 
-                to_concept in self.ontology.concepts):
-                
-                from .concept_types import RelationType
-                try:
-                    rel_enum = RelationType(relation_type.lower())
-                    self.ontology.add_relation(from_concept, rel_enum, to_concept)
-                    logger.debug(f"Relation apprise: {from_concept} {relation_type} {to_concept}")
-                except ValueError:
-                    logger.warning(f"Type de relation inconnu: {relation_type}")
-        
-        # Sauvegarde automatique si activée
+        # Sauvegarde automatique
         if self.auto_save and self.session:
             try:
                 checkpoint_path = self.session.save_checkpoint(
@@ -318,25 +358,26 @@ QUESTION: {question}"""
     def explain_reasoning(self, question: str) -> Dict[str, Any]:
         """Explique le processus de raisonnement de SophIA pour une question"""
         
-        # Analyse sans générer de réponse
-        conceptual_analysis = self._analyze_question_conceptually(question)
+        conceptual_analysis = self._extract_concepts_from_question(question)
+        lcm_reasoning = self._generate_lcm_reasoning(conceptual_analysis)
         
         explanation = {
             'question': question,
             'step1_concept_detection': {
-                'method': 'LLaMA extraction',
+                'method': 'LLaMA + Concept Bridge',
                 'concepts_found': conceptual_analysis['concepts_detected'],
-                'confidence': conceptual_analysis['confidence']
+                'confidence': conceptual_analysis['enhanced_confidence']
             },
             'step2_conceptual_reasoning': {
                 'method': 'LCM path generation',
-                'reasoning_paths': conceptual_analysis['conceptual_paths']
+                'reasoning_paths': lcm_reasoning['reasoning_paths']
             },
-            'step3_ontological_relations': {
-                'detected_relations': conceptual_analysis['relations_implied']
+            'step3_constraint_validation': {
+                'constraints_available': len(self.constraint_manager.constraints),
+                'philosophical_clusters': len(self.constraint_manager.philosophical_clusters)
             },
             'step4_synthesis': {
-                'how_response_built': 'Conceptual analysis guides LLaMA generation with constraints'
+                'how_response_built': 'Enhanced conceptual analysis guides constrained LLaMA generation'
             }
         }
         
@@ -348,29 +389,30 @@ QUESTION: {question}"""
         if not self.conversation_history:
             return {'status': 'no_conversation'}
         
-        # Analyse des concepts discutés
         all_concepts = []
+        validation_scores = []
+        
         for response in self.conversation_history:
             all_concepts.extend(response.conceptual_analysis.get('concepts_detected', []))
+            validation_scores.append(response.validation_report.get('global_score', 0))
         
         concept_frequency = {}
         for concept in all_concepts:
             concept_frequency[concept] = concept_frequency.get(concept, 0) + 1
         
-        # Concepts les plus discutés
         top_concepts = sorted(concept_frequency.items(), key=lambda x: x[1], reverse=True)
         
         return {
             'total_interactions': len(self.conversation_history),
             'most_discussed_concepts': top_concepts[:5],
-            'average_confidence': sum(
-                r.conceptual_analysis.get('confidence', 0) 
-                for r in self.conversation_history
-            ) / len(self.conversation_history),
-            'learning_events': sum(
-                1 for r in self.conversation_history 
-                if r.metadata.get('learning_triggered', False)
-            )
+            'average_confidence': sum(r.confidence for r in self.conversation_history) / len(self.conversation_history),
+            'average_validation': sum(validation_scores) / len(validation_scores) if validation_scores else 0,
+            'learning_events': sum(1 for r in self.conversation_history if hasattr(r, 'learning_triggered')),
+            'system_performance': {
+                'concept_bridge_active': True,
+                'constraint_manager_active': True,
+                'lcm_transitions': len(self.lcm_model.transitions)
+            }
         }
     
     def save_session(self, final_notes: str = "") -> str:
@@ -385,7 +427,12 @@ QUESTION: {question}"""
             'system_status': {
                 'ontology_concepts': len(self.ontology.concepts),
                 'lcm_transitions': len(self.lcm_model.transitions),
-                'llm_status': self.llm.get_model_info()['status']
+                'llm_status': self.llm.get_model_info()['status'],
+                'bridge_cache_size': len(self.concept_bridge._synonyms_cache),
+                'constraint_violations': sum(
+                    len(r.validation_report.get('violations', []))
+                    for r in self.conversation_history
+                )
             }
         }
         
@@ -399,7 +446,6 @@ QUESTION: {question}"""
         try:
             session = TrainingSession(session_name)
             
-            # Chargement du modèle final ou du dernier checkpoint
             try:
                 model, ontology, trainer, metadata = session.load_final_model()
             except FileNotFoundError:
@@ -409,11 +455,14 @@ QUESTION: {question}"""
                 else:
                     return False
             
-            # Remplacement des composants
             self.lcm_model = model
             self.ontology = ontology
             self.trainer = trainer
             self.session = session
+            
+            # Réinitialisation des modules avancés avec la nouvelle ontologie
+            self.concept_bridge = EnhancedConceptTextBridge(self.ontology, self.llm)
+            self.constraint_manager = PhilosophicalConstraintManager(self.ontology, self.llm)
             
             logger.info(f"Session '{session_name}' chargée avec succès")
             self._log_system_status()
