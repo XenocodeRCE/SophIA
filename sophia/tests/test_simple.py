@@ -60,9 +60,6 @@ try:
         bridge = EnhancedConceptTextBridge(ontology, llm)
         print("✅ Bridge créé")
         
-        # Debug: vérification directe de l'existence de la méthode
-        print(f"🔍 Type du bridge: {type(bridge)}")
-        print(f"🔍 Méthode add_concept_synonym présente: {hasattr(bridge, 'add_concept_synonym')}")
     else:
         print("⚠️ Skip bridge (LLaMA non dispo)")
         

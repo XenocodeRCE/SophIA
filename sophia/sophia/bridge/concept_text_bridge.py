@@ -1,463 +1,465 @@
 """
-Pont conceptuel entre extraction LLM et LCM avec amélioration Ollama
-Améliore la correspondance concepts ↔ texte via intelligence artificielle
+Pont entre le texte et les concepts de SophIA
+Gestion des synonymes et des relations textuelles
 """
 
-import re
-from typing import Dict, List, Tuple, Any, Optional
-from dataclasses import dataclass
-import logging
-from collections import defaultdict
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import os
+import json
+import threading
+from typing import List, Dict, Any
 
-logger = logging.getLogger(__name__)
+from sophia.core.concept_types import ConceptType
+from sophia.core.ontology import SimpleOntology, Concept
 
-@dataclass
-class ConceptMatch:
-    """Correspondance concept-texte détaillée"""
-    concept: str
-    text_span: str
-    position: Tuple[int, int]
-    confidence: float
-    context: str
-    reasoning: str
-
-class EnhancedConceptTextBridge:
-    """
-    Pont amélioré entre concepts ontologiques et texte naturel
-    Utilise Ollama pour améliorer l'analyse contextuelle
-    Parallélisation multithread pour accélérer les appels Ollama
-    """
+class ConceptTextBridge:
+    """Gère la conversion entre le texte et les concepts ontologiques"""
     
-    def __init__(self, ontology, llm_interface, max_workers: int = 4):
-        logger.info("Initialisation de EnhancedConceptTextBridge")
+    def __init__(self, ontology: SimpleOntology, llm, *args, **kwargs):
         self.ontology = ontology
-        self.llm = llm_interface
-        self.context_window = 50
+        self._standard_synonyms = {}  # Synonymes standards (à remplir selon l'ontologie)
+        self._custom_synonyms = {}    # Synonymes personnalisés (utilisateur)
+        self._custom_synonyms_path = os.path.join(os.path.dirname(__file__), "concept_synonyms.json")
+        self._cache_path = os.path.join(os.path.dirname(__file__), "concept_bridge_cache.json")
         
-        # Cache pour éviter les requêtes répétées - INITIALISE EN PREMIER
-        self._synonyms_cache = {}
-        self._context_cache = {}
-        self.max_workers = max_workers
+        print("DEBUG: ConceptTextBridge: Chargement des synonymes personnalisés...")
+        self._custom_synonyms = self._load_custom_synonyms()
+        print(f"DEBUG: ConceptTextBridge: Synonymes personnalisés chargés: {bool(self._custom_synonyms)}")
         
-        logger.debug("Construction des patterns de concepts...")
-        self.concept_patterns = self._build_concept_patterns()
-        logger.info(f"Patterns de concepts construits: {self.concept_patterns}")
+        print("DEBUG: ConceptTextBridge: Chargement du cache...")
+        self._cache = self._load_cache()
+        print(f"DEBUG: ConceptTextBridge: Cache chargé: {bool(self._cache)}")
         
-    def _build_concept_patterns(self) -> Dict[str, List[str]]:
-        """Construit des patterns de reconnaissance pour chaque concept (parallélisé pour les synonymes)"""
-        patterns = {}
-        logger.debug("Début de la construction des patterns pour chaque concept.")
-        concept_names = list(self.ontology.concepts.keys())
-        # Parallélisation pour la génération des synonymes
-        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-            future_to_concept = {
-                executor.submit(self._get_concept_synonyms, concept_name): concept_name
-                for concept_name in concept_names
-            }
-            synonyms_results = {}
-            for future in as_completed(future_to_concept):
-                concept_name = future_to_concept[future]
-                try:
-                    synonyms_results[concept_name] = future.result()
-                except Exception as exc:
-                    logger.warning(f"Erreur lors de la génération des synonymes pour {concept_name}: {exc}")
-                    synonyms_results[concept_name] = []
-        for concept_name in concept_names:
-            patterns[concept_name] = [
-                concept_name.lower(),
-                concept_name.replace('_', ' ').lower(),
-                concept_name.replace('_', '-').lower(),
-                *synonyms_results.get(concept_name, [])
-            ]
-            logger.debug(f"Patterns pour {concept_name}: {patterns[concept_name]}")
-        logger.debug("Fin de la construction des patterns.")
-        return patterns
+        self._cache_lock = threading.Lock()
+        
+        # Initialisation du cache en tâche de fond
+        print("DEBUG: ConceptTextBridge: Initialisation du cache en tâche de fond...")
+        self._init_cache_async(ontology, llm)
+        print("DEBUG: ConceptTextBridge: __init__ terminé.")
+    
+    def _load_custom_synonyms(self):
+        """Charge les synonymes personnalisés depuis un fichier JSON"""
+        
+        if os.path.exists(self._custom_synonyms_path):
+            with open(self._custom_synonyms_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        return {}
+    
+    def _save_custom_synonyms(self):
+        """Sauvegarde les synonymes personnalisés dans un fichier JSON"""
+        
+        with open(self._custom_synonyms_path, "w", encoding="utf-8") as f:
+            json.dump(self._custom_synonyms, f, ensure_ascii=False, indent=2)
+    
+    def _load_cache(self):
+        """Charge le cache depuis un fichier JSON"""
+        
+        if os.path.exists(self._cache_path):
+            with open(self._cache_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        return {}
+    
+    def _save_cache(self):
+        """Sauvegarde le cache dans un fichier JSON"""
+        
+        with self._cache_lock:
+            with open(self._cache_path, "w", encoding="utf-8") as f:
+                json.dump(self._cache, f, ensure_ascii=False, indent=2)
+    
+    def _init_cache_async(self, ontology, llm):
+        """Initialise le cache en tâche de fond si besoin."""
+        def build_cache():
+            updated = False
+            for concept in ontology.concepts.values():
+                cname = concept.name
+                if cname not in self._cache.get("synonyms", {}):
+                    # Calcul coûteux : synonymes
+                    syns = self._get_standard_synonyms(cname)
+                    self._cache.setdefault("synonyms", {})[cname] = syns
+                    updated = True
+                # Ajoutez ici d'autres calculs coûteux à mettre en cache si besoin
+            if updated:
+                self._save_cache()
+        # Lancement en thread pour ne pas bloquer l'init
+        threading.Thread(target=build_cache, daemon=True).start()
+    
+    def _get_standard_synonyms(self, concept_name: str) -> List[str]:
+        """Retourne les synonymes standards d'un concept"""
+        
+        # Synonymes prédéfinis pour les concepts philosophiques courants
+        standard_synonyms_db = {
+            'VÉRITÉ': ['vrai', 'véracité', 'réalité', 'authenticité', 'exactitude'],
+            'JUSTICE': ['équité', 'droit', 'justesse', 'impartialité', 'équitable'],
+            'LIBERTÉ': ['libre arbitre', 'autonomie', 'indépendance', 'libre'],
+            'BIEN': ['bon', 'bonté', 'vertu', 'moral', 'bienveillance'],
+            'MAL': ['mauvais', 'méchanceté', 'vice', 'immoral', 'malveillance'],
+            'ÊTRE': ['existence', 'ontologie', 'réalité', 'existant'],
+            'DEVENIR': ['changement', 'évolution', 'transformation', 'mutation'],
+            'CONNAISSANCE': ['savoir', 'science', 'épistémologie', 'comprendre'],
+            'CROYANCE': ['foi', 'conviction', 'opinion', 'croire'],
+            'CAUSE': ['causalité', 'origine', 'source', 'raison'],
+            'EFFET': ['conséquence', 'résultat', 'impact', 'suite'],
+            'TEMPS': ['temporel', 'durée', 'moment', 'époque'],
+            'ESPACE': ['spatial', 'lieu', 'étendue', 'dimension'],
+            'CONSCIENCE': ['conscient', 'awareness', 'lucidité', 'éveil'],
+            'MORT': ['mortalité', 'décès', 'fin', 'trépas'],
+            'VIE': ['vivant', 'existence', 'vital', 'biologique'],
+            'AMOUR': ['affection', 'sentiment', 'passion', 'tendresse'],
+            'HAINE': ['antipathie', 'aversion', 'hostilité', 'répulsion'],
+            'BEAUTÉ': ['esthétique', 'beau', 'harmonie', 'élégance'],
+            'LAIDEUR': ['laid', 'difformité', 'inesthétique', 'disgracieux']
+        }
+        
+        return standard_synonyms_db.get(concept_name, [])
     
     def _get_concept_synonyms(self, concept_name: str) -> List[str]:
-        """Génère des synonymes contextuels via Ollama"""
-        logger.debug(f"Recherche des synonymes pour le concept: {concept_name}")
-        # Cache pour éviter les requêtes répétées
-        if concept_name in self._synonyms_cache:
-            logger.debug(f"Synonymes trouvés dans le cache pour {concept_name}: {self._synonyms_cache[concept_name]}")
-            return self._synonyms_cache[concept_name]
+        """Retourne la liste des synonymes (standards et personnalisés) pour un concept"""
         
-        # Synonymes de base (fallback)
-        base_synonyms = {
-            'VÉRITÉ': ['vrai', 'véracité', 'réalité', 'authenticité'],
-            'JUSTICE': ['équité', 'droit', 'justesse', 'impartialité'],
-            'LIBERTÉ': ['libre arbitre', 'autonomie', 'indépendance'],
-            'BIEN': ['bon', 'bonté', 'vertu', 'moral'],
-            'MAL': ['mauvais', 'méchanceté', 'vice', 'immoral'],
-            'ÊTRE': ['existence', 'ontologie', 'réalité'],
-            'DEVENIR': ['changement', 'évolution', 'transformation'],
-            'CONNAISSANCE': ['savoir', 'science', 'épistémologie'],
-            'CROYANCE': ['foi', 'conviction', 'opinion'],
-            'CAUSE': ['causalité', 'origine', 'source'],
-            'EFFET': ['conséquence', 'résultat', 'impact']
-        }
+        # Synonymes standards (cache disque)
+        synonyms = set(self._cache.get("synonyms", {}).get(concept_name, []))
         
-        base_list = base_synonyms.get(concept_name, [])
-        logger.debug(f"Synonymes de base pour {concept_name}: {base_list}")
+        # Ajout des synonymes standards prédéfinis
+        standard_syns = self._get_standard_synonyms(concept_name)
+        synonyms.update(standard_syns)
         
-        # Enrichissement via Ollama
-        try:
-            if hasattr(self.llm, 'available') and self.llm.available:
-                logger.info(f"Appel à Ollama pour générer des synonymes pour {concept_name}")
-                prompt = f"""Génère 3 synonymes philosophiques précis pour le concept "{concept_name}".
-Format: mot1, mot2, mot3
-Seulement les mots, pas d'explication.
-
-Concept: {concept_name}
-Synonymes:"""
-                
-                ollama_response = self.llm.generate_text(prompt, max_tokens=30, temperature=0.3)
-                logger.debug(f"Réponse Ollama brute: {ollama_response}")
-                
-                # Extraction des synonymes
-                ollama_synonyms = []
-                if ollama_response:
-                    # Nettoyage et extraction
-                    cleaned = ollama_response.strip().lower()
-                    # Suppression des numéros et caractères indésirables
-                    cleaned = re.sub(r'\d+\.?\s*', '', cleaned)
-                    
-                    synonyms = [s.strip() for s in cleaned.split(',')]
-                    ollama_synonyms = [s for s in synonyms if s and len(s) > 2 and len(s) < 20]
-                    logger.debug(f"Synonymes extraits d'Ollama pour {concept_name}: {ollama_synonyms}")
-                
-                # Combinaison base + Ollama
-                all_synonyms = base_list + ollama_synonyms[:3]  # Limite à 3 synonymes Ollama
-                logger.info(f"Synonymes combinés pour {concept_name}: {all_synonyms}")
-            else:
-                logger.info(f"Ollama non disponible, utilisation des synonymes de base pour {concept_name}")
-                all_synonyms = base_list
-            
-            # Cache du résultat
-            self._synonyms_cache[concept_name] = all_synonyms
-            logger.debug(f"Synonymes mis en cache pour {concept_name}: {all_synonyms}")
-            return all_synonyms
-            
-        except Exception as e:
-            logger.warning(f"Erreur génération synonymes Ollama pour {concept_name}: {e}")
-            self._synonyms_cache[concept_name] = base_list
-            return base_list
+        # Synonymes personnalisés
+        custom = self._custom_synonyms.get(concept_name, [])
+        synonyms.update(custom)
+        
+        return list(synonyms)
     
-    def _analyze_concept_context(self, match: ConceptMatch) -> Dict[str, Any]:
-        """Analyse le contexte d'un concept via Ollama"""
-        logger.debug(f"Analyse du contexte pour le match: {match}")
-        
-        # Cache pour éviter les requêtes répétées
-        cache_key = f"{match.concept}:{match.context[:30]}"
-        if cache_key in self._context_cache:
-            logger.debug(f"Contexte trouvé dans le cache pour la clé: {cache_key}")
-            return self._context_cache[cache_key]
-        
-        # Analyse de base (fallback)
-        context_lower = match.context.lower()
-        
-        base_analysis = {
-            'sentiment': 'neutre',
-            'context_length': len(match.context),
-            'philosophical_context': any(word in context_lower for word in [
-                'philosophie', 'pensée', 'réflexion', 'théorie'
-            ]),
-            'complexity': 'medium'
-        }
-        
-        # Enrichissement via Ollama
-        try:
-            if hasattr(self.llm, 'available') and self.llm.available:
-                logger.info(f"Appel à Ollama pour analyse contextuelle du concept {match.concept}")
-                prompt = f"""Analyse ce contexte philosophique pour le concept "{match.concept}":
-
-CONTEXTE: "{match.context[:100]}..."
-CONCEPT: {match.concept}
-
-Réponds avec ce format exact:
-sentiment: [positif/négatif/neutre]
-complexité: [simple/medium/complexe]
-thème: [éthique/métaphysique/épistémologie/logique/politique/autre]
-
-Analyse:"""
-                
-                ollama_response = self.llm.generate_text(prompt, max_tokens=60, temperature=0.2)
-                logger.debug(f"Réponse Ollama analyse contexte: {ollama_response}")
-                
-                if ollama_response:
-                    # Extraction des informations
-                    lines = ollama_response.lower().split('\n')
-                    for line in lines:
-                        if ':' in line:
-                            key, value = line.split(':', 1)
-                            key = key.strip()
-                            value = value.strip()
-                            
-                            if 'sentiment' in key:
-                                base_analysis['sentiment'] = value
-                            elif 'complexité' in key or 'complexity' in key:
-                                base_analysis['complexity'] = value
-                            elif 'thème' in key or 'theme' in key:
-                                base_analysis['philosophical_theme'] = value
-            
-            # Cache du résultat
-            self._context_cache[cache_key] = base_analysis
-            logger.debug(f"Analyse contextuelle mise en cache pour {cache_key}: {base_analysis}")
-            
-        except Exception as e:
-            logger.warning(f"Erreur analyse contexte Ollama: {e}")
-            self._context_cache[cache_key] = base_analysis
-        
-        return base_analysis
+    def add_concept_synonym(self, concept_name: str, synonym: str):
+        """Ajoute un synonyme personnalisé pour un concept et sauvegarde."""
+        print(f"DEBUG: ConceptTextBridge.add_concept_synonym appelée pour {concept_name} -> {synonym}")
+        if concept_name not in self._custom_synonyms:
+            self._custom_synonyms[concept_name] = []
+        if synonym not in self._custom_synonyms[concept_name]:
+            self._custom_synonyms[concept_name].append(synonym)
+            self._save_custom_synonyms()
+            print(f"DEBUG: ConceptTextBridge: Synonyme '{synonym}' ajouté pour '{concept_name}' et sauvegardé.")
+        else:
+            print(f"DEBUG: ConceptTextBridge: Synonyme '{synonym}' existe déjà pour '{concept_name}'.")
     
-    def enhanced_concept_extraction(self, text: str, 
-                                  base_extraction: Dict[str, Any]) -> Dict[str, Any]:
+    def get_concept(self, text: str) -> Concept:
+        """Retourne le concept associé à un texte donné (avec gestion des synonymes)"""
+        
+        text_lower = text.lower().strip()
+        
+        # Recherche directe par nom de concept
+        for concept_name, concept in self.ontology.concepts.items():
+            if concept_name.lower() == text_lower:
+                return concept
+        
+        # Recherche par synonymes
+        for concept_name, concept in self.ontology.concepts.items():
+            synonyms = self._get_concept_synonyms(concept_name)
+            for synonym in synonyms:
+                if synonym.lower() == text_lower:
+                    return concept
+        
+        return None
+    
+    def are_concepts_related(self, concept_name1: str, concept_name2: str) -> bool:
+        """Vérifie si deux concepts sont liés par une relation ontologique"""
+        
+        concept1 = self.ontology.get_concept(concept_name1)
+        concept2 = self.ontology.get_concept(concept_name2)
+        
+        if not concept1 or not concept2:
+            return False
+        
+        # Vérification des relations directes
+        if concept2.name in concept1.relations.get('related_to', []):
+            return True
+        if concept1.name in concept2.relations.get('related_to', []):
+            return True
+        
+        # Vérification des synonymes
+        synonyms1 = self._get_concept_synonyms(concept_name1)
+        synonyms2 = self._get_concept_synonyms(concept_name2)
+        
+        for syn1 in synonyms1:
+            if syn1 in concept2.relations.get('related_to', []):
+                return True
+        for syn2 in synonyms2:
+            if syn2 in concept1.relations.get('related_to', []):
+                return True
+        
+        return False
+    
+    def get_related_concepts(self, concept_name: str) -> List[Concept]:
+        """Retourne les concepts liés à un concept donné"""
+        
+        concept = self.ontology.get_concept(concept_name)
+        
+        if not concept:
+            return []
+        
+        related_concepts = []
+        
+        # Relations directes
+        for related_name in concept.relations.get('related_to', []):
+            related_concept = self.ontology.get_concept(related_name)
+            if related_concept:
+                related_concepts.append(related_concept)
+        
+        # Synonymes
+        synonyms = self._get_concept_synonyms(concept_name)
+        for synonym in synonyms:
+            synonym_concept = self.ontology.get_concept(synonym)
+            if synonym_concept:
+                for related_name in synonym_concept.relations.get('related_to', []):
+                    related_concept = self.ontology.get_concept(related_name)
+                    if related_concept and related_concept.name != concept_name:
+                        related_concepts.append(related_concept)
+        
+        return list(set(related_concepts))  # Unique concepts only
+    
+    def update_standard_synonyms(self, new_synonyms: Dict[str, List[str]]):
+        """Met à jour les synonymes standards (pour test ou autre usage)"""
+        
+        self._standard_synonyms.update(new_synonyms)
+    
+    def clear_custom_synonyms(self):
+        """Efface tous les synonymes personnalisés"""
+        
+        self._custom_synonyms = {}
+        self._save_custom_synonyms()
+
+class EnhancedConceptTextBridge(ConceptTextBridge):
+    """Version enrichie du ConceptTextBridge avec extraction conceptuelle avancée"""
+    
+    def __init__(self, ontology: SimpleOntology, llm, *args, **kwargs):
+        print("DEBUG: EnhancedConceptTextBridge __init__ début.")
+        super().__init__(ontology, llm, *args, **kwargs)
+        print("DEBUG: EnhancedConceptTextBridge __init__ fin.")
+        
+        # Vérification de la présence de la méthode après l'initialisation
+        if hasattr(self, 'add_concept_synonym'):
+            print("DEBUG: EnhancedConceptTextBridge instance a bien 'add_concept_synonym'.")
+        else:
+            print("ERREUR DEBUG: EnhancedConceptTextBridge instance N'A PAS 'add_concept_synonym'.")
+            print(f"DEBUG: MRO: {type(self).mro()}")
+
+    def enhanced_concept_extraction(self, text: str, base_extraction: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Extraction conceptuelle améliorée avec analyse contextuelle Ollama
+        Extraction conceptuelle améliorée avec analyse contextuelle
+        Méthode principale utilisée par sophia_hybrid.py
         """
-        logger.info("Début de l'extraction conceptuelle améliorée.")
-        matches = []
-        text_lower = text.lower()
-        logger.debug(f"Texte analysé (minuscule): {text_lower[:100]}...")
-        # 1. Analyse des concepts de base détectés
+        print(f"DEBUG: enhanced_concept_extraction appelée avec texte: {text[:50]}...")
+        
+        # 1. Récupération des concepts de base
         base_concepts = base_extraction.get('concepts_detected', [])
-        logger.info(f"Concepts de base détectés: {base_concepts}")
-        for concept in base_concepts:
-            logger.debug(f"Recherche des occurrences pour le concept de base: {concept}")
-            concept_matches = self._find_concept_in_text(concept, text, text_lower)
-            logger.debug(f"Occurrences trouvées: {concept_matches}")
-            matches.extend(concept_matches)
-        # 2. Recherche de concepts additionnels par patterns
-        logger.info("Recherche de concepts additionnels...")
-        additional_concepts = self._find_additional_concepts(text, text_lower, base_concepts)
-        logger.debug(f"Concepts additionnels trouvés: {additional_concepts}")
-        matches.extend(additional_concepts)
-        # 3. Analyse contextuelle et validation
-        logger.info("Validation des correspondances conceptuelles...")
-        validated_matches = self._validate_concept_matches(matches, text)
-        logger.debug(f"Correspondances validées: {validated_matches}")
-        # 4. Construction de la réponse enrichie
-        enhanced_extraction = {
-            **base_extraction,
-            'concept_matches': [self._match_to_dict(m) for m in validated_matches],
-            'concepts_detailed': self._build_detailed_concepts(validated_matches),
-            'contextual_analysis': self._analyze_context(validated_matches, text),
-            'enhanced_confidence': self._calculate_enhanced_confidence(validated_matches),
-            'concepts_detected': list(set(base_concepts + [m.concept for m in validated_matches]))
-        }
-        logger.info(f"Extraction conceptuelle enrichie générée: {enhanced_extraction}")
-        return enhanced_extraction
-    
-    def _find_concept_in_text(self, concept: str, text: str, text_lower: str) -> List[ConceptMatch]:
-        """Trouve toutes les occurrences d'un concept dans le texte"""
-        logger.debug(f"Recherche des occurrences du concept '{concept}' dans le texte.")
-        matches = []
-        patterns = self.concept_patterns.get(concept, [concept.lower()])
-        logger.debug(f"Patterns utilisés pour '{concept}': {patterns}")
-        for pattern in patterns:
-            regex = r'\b' + re.escape(pattern) + r'\b'
-            logger.debug(f"Recherche avec regex: {regex}")
-            for match in re.finditer(regex, text_lower):
-                start, end = match.span()
-                logger.debug(f"Correspondance trouvée: {pattern} [{start}:{end}]")
-                context_start = max(0, start - self.context_window)
-                context_end = min(len(text), end + self.context_window)
-                context = text[context_start:context_end]
-                confidence = self._calculate_pattern_confidence(pattern, concept, context)
-                logger.debug(f"Confiance calculée: {confidence}, contexte: {context}")
-                matches.append(ConceptMatch(
-                    concept=concept,
-                    text_span=text[start:end],
-                    position=(start, end),
-                    confidence=confidence,
-                    context=context,
-                    reasoning=f"Pattern '{pattern}' matched for concept {concept}"
-                ))
-        logger.debug(f"Total des correspondances pour '{concept}': {len(matches)}")
-        return matches
-    
-    def _find_additional_concepts(self, text: str, text_lower: str, 
-                                base_concepts: List[str]) -> List[ConceptMatch]:
-        """Recherche de concepts additionnels non détectés initialement"""
-        logger.debug("Début de la recherche de concepts additionnels.")
-        additional_matches = []
-        found_concepts = set(base_concepts)
-        for concept_name in self.ontology.concepts.keys():
-            if concept_name not in found_concepts:
-                logger.debug(f"Recherche d'occurrences pour le concept additionnel: {concept_name}")
-                matches = self._find_concept_in_text(concept_name, text, text_lower)
-                strong_matches = [m for m in matches if m.confidence > 0.6]
-                logger.debug(f"Correspondances fortes pour {concept_name}: {strong_matches}")
-                additional_matches.extend(strong_matches)
-        logger.debug(f"Total des concepts additionnels trouvés: {len(additional_matches)}")
-        return additional_matches
-    
-    def _validate_concept_matches(self, matches: List[ConceptMatch], 
-                                text: str) -> List[ConceptMatch]:
-        """Valide et filtre les correspondances conceptuelles"""
-        logger.debug("Début de la validation des correspondances conceptuelles.")
-        concept_groups = defaultdict(list)
-        for match in matches:
-            concept_groups[match.concept].append(match)
-        validated = []
-        for concept, concept_matches in concept_groups.items():
-            best_match = max(concept_matches, key=lambda m: m.confidence)
-            logger.debug(f"Meilleure correspondance pour {concept}: {best_match}")
-            if self._is_contextually_valid(best_match, text):
-                logger.debug(f"Correspondance validée pour {concept}")
-                validated.append(best_match)
-            else:
-                logger.debug(f"Correspondance rejetée pour {concept} (contexte négatif)")
-        logger.debug(f"Total des correspondances validées: {len(validated)}")
-        return validated
-    
-    def _is_contextually_valid(self, match: ConceptMatch, text: str) -> bool:
-        """Valide un match dans son contexte"""
-        logger.debug(f"Validation contextuelle pour le match: {match}")
-        negative_words = ['ne pas', 'non', 'absence de', 'manque de', 'sans']
-        context_words = match.context.lower()
-        match_position = context_words.find(match.text_span.lower())
-        for neg_word in negative_words:
-            if neg_word in context_words:
-                neg_pos = context_words.find(neg_word)
-                if abs(neg_pos - match_position) < 30:
-                    logger.debug(f"Contexte négatif détecté pour {match.concept}: {neg_word} proche de la position du match")
-                    return False
-        return True
-    
-    def _calculate_pattern_confidence(self, pattern: str, concept: str, context: str) -> float:
-        """Calcule la confiance d'un pattern dans son contexte"""
-        logger.debug(f"Calcul de la confiance pour le pattern '{pattern}' du concept '{concept}' dans le contexte.")
-        base_confidence = 0.7
+        base_confidence = base_extraction.get('confidence', 0.5)
         
-        if pattern == concept.lower():
-            base_confidence += 0.2
+        print(f"DEBUG: Concepts de base: {base_concepts}")
         
-        philosophical_words = [
-            'philosophie', 'pensée', 'réflexion', 'concept', 'idée',
-            'théorie', 'doctrine', 'principe', 'essence', 'nature'
-        ]
+        # 2. Recherche de concepts additionnels via synonymes
+        additional_concepts = self._find_additional_concepts_via_synonyms(text, base_concepts)
         
-        context_lower = context.lower()
-        for word in philosophical_words:
-            if word in context_lower:
-                base_confidence += 0.1
-                logger.debug(f"Mot philosophique détecté dans le contexte: {word}")
-                break
+        # 3. Recherche de concepts par mots-clés philosophiques
+        keyword_concepts = self._find_concepts_by_keywords(text, base_concepts + additional_concepts)
         
-        final_confidence = min(base_confidence, 1.0)
-        logger.debug(f"Confiance finale: {final_confidence}")
-        return final_confidence
-    
-    def _calculate_enhanced_confidence(self, matches: List[ConceptMatch]) -> float:
-        """Calcule la confiance globale améliorée"""
-        logger.debug("Calcul de la confiance globale améliorée.")
-        if not matches:
-            logger.debug("Aucune correspondance, confiance globale = 0.0")
-            return 0.0
+        # 4. Analyse contextuelle simple
+        context_analysis = self._analyze_text_context(text)
         
-        total_confidence = sum(match.confidence for match in matches)
-        avg_confidence = total_confidence / len(matches)
+        # 5. Analyse des relations entre concepts
+        concept_relations = self._analyze_concept_relations(base_concepts + additional_concepts + keyword_concepts)
         
-        unique_concepts = len(set(match.concept for match in matches))
-        diversity_bonus = min(unique_concepts * 0.05, 0.2)
-        
-        final_score = min(avg_confidence + diversity_bonus, 1.0)
-        logger.debug(f"Confiance moyenne: {avg_confidence}, bonus diversité: {diversity_bonus}, score final: {final_score}")
-        return final_score
-    
-    def _build_detailed_concepts(self, matches: List[ConceptMatch]) -> Dict[str, Dict]:
-        """Construit une analyse détaillée des concepts (parallélisé pour l'analyse contextuelle)"""
-        logger.debug("Construction de l'analyse détaillée des concepts.")
-        detailed = {}
-        # Parallélisation pour l'analyse contextuelle
-        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-            future_to_match = {
-                executor.submit(self._analyze_concept_context, match): match
-                for match in matches
-            }
-            context_results = {}
-            for future in as_completed(future_to_match):
-                match = future_to_match[future]
-                try:
-                    context_results[match] = future.result()
-                except Exception as exc:
-                    logger.warning(f"Erreur analyse contextuelle pour {match.concept}: {exc}")
-                    context_results[match] = {}
-        for match in matches:
-            if match.concept not in detailed:
-                logger.debug(f"Ajout du concept {match.concept} à l'analyse détaillée.")
-                detailed[match.concept] = {
-                    'confidence': match.confidence,
-                    'occurrences': [],
-                    'context_analysis': context_results.get(match, {})
-                }
-            detailed[match.concept]['occurrences'].append({
-                'text': match.text_span,
-                'position': match.position,
-                'context': match.context
-            })
-        logger.debug(f"Analyse détaillée construite: {detailed}")
-        return detailed
-    
-    def _analyze_context(self, matches: List[ConceptMatch], text: str) -> Dict[str, Any]:
-        """Analyse contextuelle globale"""
-        logger.debug("Début de l'analyse contextuelle globale.")
-        analysis = {
-            'total_concepts_found': len(matches),
-            'text_length': len(text),
-            'concept_density': len(matches) / max(len(text.split()), 1),
-            'philosophical_indicators': self._count_philosophical_indicators(text),
-            'complexity_score': self._calculate_complexity_score(matches, text)
-        }
-        logger.debug(f"Analyse contextuelle globale: {analysis}")
-        return analysis
-    
-    def _count_philosophical_indicators(self, text: str) -> int:
-        """Compte les indicateurs philosophiques dans le texte"""
-        logger.debug("Comptage des indicateurs philosophiques dans le texte.")
-        indicators = [
-            'pourquoi', 'comment', 'qu\'est-ce que', 'nature de',
-            'essence de', 'signification', 'sens de', 'définition',
-            'concept de', 'idée de', 'théorie de', 'principe de'
-        ]
-        
-        text_lower = text.lower()
-        count = sum(1 for indicator in indicators if indicator in text_lower)
-        logger.debug(f"Nombre d'indicateurs philosophiques trouvés: {count}")
-        return count
-    
-    def _calculate_complexity_score(self, matches: List[ConceptMatch], text: str) -> float:
-        """Calcule un score de complexité philosophique"""
-        logger.debug("Calcul du score de complexité philosophique.")
-        if not matches:
-            logger.debug("Aucune correspondance, score de complexité = 0.0")
-            return 0.0
-        
-        concept_count = len(matches)
-        unique_concepts = len(set(match.concept for match in matches))
-        avg_confidence = sum(match.confidence for match in matches) / len(matches)
-        text_length = len(text.split())
-        
-        complexity = (
-            (concept_count * 0.3) +
-            (unique_concepts * 0.4) +
-            (avg_confidence * 0.2) +
-            (min(text_length / 100, 1.0) * 0.1)
+        # 6. Calcul de confiance améliorée
+        all_concepts = list(set(base_concepts + additional_concepts + keyword_concepts))
+        enhanced_confidence = self._calculate_enhanced_confidence(
+            all_concepts, base_confidence, context_analysis
         )
         
-        final_complexity = min(complexity, 1.0)
-        logger.debug(f"Score de complexité calculé: {final_complexity}")
-        return final_complexity
-    
-    def _match_to_dict(self, match: ConceptMatch) -> Dict[str, Any]:
-        """Convertit un ConceptMatch en dictionnaire"""
-        logger.debug(f"Conversion du ConceptMatch en dict: {match}")
-        return {
-            'concept': match.concept,
-            'text_span': match.text_span,
-            'position': match.position,
-            'confidence': match.confidence,
-            'context': match.context,
-            'reasoning': match.reasoning
+        # 7. Construction de la réponse enrichie
+        enhanced_extraction = {
+            **base_extraction,
+            'concepts_detected': all_concepts,
+            'enhanced_confidence': enhanced_confidence,
+            'additional_concepts_found': additional_concepts,
+            'keyword_concepts_found': keyword_concepts,
+            'context_analysis': context_analysis,
+            'concept_relations': concept_relations,
+            'method': 'enhanced_bridge_with_synonyms_and_keywords',
+            'bridge_version': 'v2.1',
+            'extraction_details': {
+                'base_concepts_count': len(base_concepts),
+                'synonym_concepts_count': len(additional_concepts),
+                'keyword_concepts_count': len(keyword_concepts),
+                'total_concepts_count': len(all_concepts)
+            }
         }
+        
+        print(f"DEBUG: Extraction enrichie terminée: {len(all_concepts)} concepts")
+        return enhanced_extraction
+
+    def _find_additional_concepts_via_synonyms(self, text: str, base_concepts: List[str]) -> List[str]:
+        """Trouve des concepts additionnels en utilisant les synonymes"""
+        text_lower = text.lower()
+        additional_concepts = []
+        
+        # Parcours de tous les concepts de l'ontologie
+        for concept_name in self.ontology.concepts.keys():
+            if concept_name not in base_concepts:
+                # Vérification des synonymes
+                synonyms = self._get_concept_synonyms(concept_name)
+                
+                for synonym in synonyms:
+                    if synonym.lower() in text_lower:
+                        additional_concepts.append(concept_name)
+                        print(f"DEBUG: Concept additionnel trouvé: {concept_name} via synonyme '{synonym}'")
+                        break
+        
+        return additional_concepts
+
+    def _find_concepts_by_keywords(self, text: str, existing_concepts: List[str]) -> List[str]:
+        """Trouve des concepts via des mots-clés philosophiques spécifiques"""
+        text_lower = text.lower()
+        keyword_concepts = []
+        
+        # Mots-clés spécifiques pour concepts philosophiques
+        concept_keywords = {
+            'VÉRITÉ': ['vérité', 'véracité', 'authentique', 'réel', 'vrai'],
+            'JUSTICE': ['justice', 'juste', 'équité', 'équitable', 'droit', 'injustice'],
+            'LIBERTÉ': ['liberté', 'libre', 'autonomie', 'indépendance', 'libre arbitre'],
+            'CONNAISSANCE': ['connaissance', 'savoir', 'connaître', 'comprendre', 'épistémologie'],
+            'ÊTRE': ['être', 'existence', 'exister', 'ontologie', 'existant'],
+            'DEVENIR': ['devenir', 'changement', 'évolution', 'transformation', 'mutation'],
+            'BIEN': ['bien', 'bon', 'bonté', 'vertu', 'moral', 'éthique'],
+            'MAL': ['mal', 'mauvais', 'vice', 'immoral', 'méchanceté'],
+            'BEAUTÉ': ['beauté', 'beau', 'esthétique', 'harmonie', 'élégance'],
+            'TEMPS': ['temps', 'temporel', 'durée', 'moment', 'époque', 'chronologie'],
+            'ESPACE': ['espace', 'spatial', 'lieu', 'étendue', 'dimension'],
+            'CONSCIENCE': ['conscience', 'conscient', 'awareness', 'lucidité', 'éveil'],
+            'MORT': ['mort', 'mortalité', 'décès', 'fin', 'trépas'],
+            'VIE': ['vie', 'vivant', 'vital', 'biologique', 'existence'],
+            'AMOUR': ['amour', 'affection', 'sentiment', 'passion', 'tendresse'],
+            'CAUSE': ['cause', 'causalité', 'origine', 'source', 'raison'],
+            'EFFET': ['effet', 'conséquence', 'résultat', 'impact', 'suite']
+        }
+        
+        for concept_name, keywords in concept_keywords.items():
+            if concept_name not in existing_concepts:
+                for keyword in keywords:
+                    if keyword in text_lower:
+                        keyword_concepts.append(concept_name)
+                        print(f"DEBUG: Concept par mot-clé trouvé: {concept_name} via '{keyword}'")
+                        break
+        
+        return keyword_concepts
+
+    def _analyze_text_context(self, text: str) -> Dict[str, Any]:
+        """Analyse contextuelle simple du texte"""
+        text_lower = text.lower()
+        
+        # Indicateurs philosophiques
+        philosophical_indicators = [
+            'qu\'est-ce que', 'nature de', 'essence de', 'définition',
+            'pourquoi', 'comment', 'peut-on', 'doit-on',
+            'philosophie', 'pensée', 'réflexion', 'concept',
+            'théorie', 'doctrine', 'principe'
+        ]
+        
+        indicators_found = [ind for ind in philosophical_indicators if ind in text_lower]
+        
+        # Types de questions
+        question_type = 'unknown'
+        if any(word in text_lower for word in ['qu\'est-ce que', 'nature de', 'essence']):
+            question_type = 'definition'
+        elif any(word in text_lower for word in ['pourquoi', 'comment']):
+            question_type = 'explanation'
+        elif any(word in text_lower for word in ['peut-on', 'doit-on']):
+            question_type = 'normative'
+        elif any(word in text_lower for word in ['relation', 'lien', 'rapport']):
+            question_type = 'relational'
+        
+        # Complexité linguistique
+        complexity_indicators = {
+            'long_sentences': len([s for s in text.split('.') if len(s.split()) > 10]),
+            'philosophical_terms': len(indicators_found),
+            'question_marks': text.count('?'),
+            'conjunctions': len([w for w in ['et', 'ou', 'mais', 'donc', 'car'] if w in text_lower])
+        }
+        
+        return {
+            'text_length': len(text),
+            'word_count': len(text.split()),
+            'philosophical_indicators': indicators_found,
+            'question_type': question_type,
+            'complexity_score': min(len(text) / 100, 1.0),
+            'complexity_indicators': complexity_indicators,
+            'has_question_mark': '?' in text,
+            'is_interrogative': question_type != 'unknown'
+        }
+
+    def _analyze_concept_relations(self, concepts: List[str]) -> List[Dict[str, Any]]:
+        """Analyse les relations entre les concepts détectés"""
+        relations = []
+        
+        for i, concept1 in enumerate(concepts):
+            for concept2 in concepts[i+1:]:
+                if self.are_concepts_related(concept1, concept2):
+                    relations.append({
+                        'concept1': concept1,
+                        'concept2': concept2,
+                        'relation_type': 'related_to',
+                        'strength': 0.8  # Simplified strength score
+                    })
+        
+        return relations
+
+    def _calculate_enhanced_confidence(self, concepts: List[str], base_confidence: float, 
+                                     context_analysis: Dict[str, Any]) -> float:
+        """Calcule une confiance améliorée basée sur plusieurs facteurs"""
+        
+        # Facteur de base
+        enhanced_confidence = base_confidence
+        
+        # Bonus pour concepts multiples (diversité conceptuelle)
+        concept_bonus = min(len(concepts) * 0.08, 0.25)
+        enhanced_confidence += concept_bonus
+        
+        # Bonus pour indicateurs philosophiques
+        philosophical_indicators = context_analysis.get('philosophical_indicators', [])
+        philosophical_bonus = min(len(philosophical_indicators) * 0.05, 0.15)
+        enhanced_confidence += philosophical_bonus
+        
+        # Bonus pour type de question identifié
+        question_bonus = 0.1 if context_analysis.get('question_type') != 'unknown' else 0
+        enhanced_confidence += question_bonus
+        
+        # Bonus pour complexité appropriée
+        complexity_score = context_analysis.get('complexity_score', 0)
+        if 0.3 <= complexity_score <= 0.8:  # Complexité optimale
+            enhanced_confidence += 0.05
+        
+        # Bonus pour question interrogative
+        if context_analysis.get('is_interrogative'):
+            enhanced_confidence += 0.05
+        
+        # Normalisation finale
+        enhanced_confidence = min(enhanced_confidence, 1.0)
+        enhanced_confidence = max(enhanced_confidence, 0.0)
+        
+        return enhanced_confidence
+
+    # Redéfinition explicite pour s'assurer qu'elle est disponible
+    def add_concept_synonym(self, concept_name: str, synonym: str):
+        """Ajoute un synonyme personnalisé pour un concept et sauvegarde."""
+        print(f"DEBUG: EnhancedConceptTextBridge.add_concept_synonym (explicite) appelée pour {concept_name} -> {synonym}")
+        # Appel à la méthode de la classe parente
+        return super().add_concept_synonym(concept_name, synonym)
+
+    # Version publique si nécessaire pour le test
+    def get_public_concept_synonyms(self, concept_name: str) -> List[str]:
+        print(f"DEBUG: EnhancedConceptTextBridge.get_public_concept_synonyms appelée pour {concept_name}")
+        return self._get_concept_synonyms(concept_name)
+
+    def extract_concepts(self, text: str, existing_extraction: Dict[str, Any] = None) -> Dict[str, Any]:
+        """
+        Méthode alternative d'extraction pour compatibilité
+        """
+        if existing_extraction is None:
+            existing_extraction = {'concepts_detected': [], 'confidence': 0.5}
+        
+        return self.enhanced_concept_extraction(text, existing_extraction)

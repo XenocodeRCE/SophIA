@@ -1,0 +1,633 @@
+[
+  {
+    "question": "peut-on être juste en désobéissant aux lois ?",
+    "response": "Intéressante question qui soulève des interrogations fondamentales sur la justice, les lois et l'existence elle-même. Laissez-moi tenter d'éclairer ce débat.\n\nPuisqu'on est à la recherche de réponses s'appuyant sur le concept d'être (ÊTRE), il convient de préciser que par être, nous entendons toute entité susceptible d'exister. Cela englobe non seulement les individus mais également les communautés, les institutions et même les idées qui influencent notre perception du monde.\n\nOr, lorsqu'on envisage la possibilité de désobéir aux lois, on se pose inévitablement la question : que signifie être juste dans ce contexte ? La justice est souvent associée à l'observation des règles et lois établies par les sociétés humaines. Cependant, cette approche peut être limitante.\n\nPensons-y. Les lois sont créées pour maintenir l'ordre social, protéger les droits individuels et promouvoir le bien commun. Pourtant, dans certaines situations, les lois peuvent devenir injustes ou inadaptées aux changements sociétaux. Lorsque cela se produit, désobéir à ces lois peut être considéré comme un acte juste s'il vise à rectifier des injustices ou à promouvoir le bien-être général.\n\nConsidérons les exemples historiques de résistances pacifiques ou de mouvements de liberté qui ont défié les lois oppressives. Ces actions, même s'elles impliquaient la désobéissance aux règles établies, ont souvent contribué à l'avancement de la justice et des droits humains.\n\nPar conséquent, on peut soutenir que, dans certains cas, être juste peut prendre la forme de désobéir aux lois. Cela nécessite une compréhension nuancée du contexte social et politique, ainsi qu'une volonté de remettre en question les règles existantes lorsqu'elles sont perçues comme contraires à l'éthique ou incompatibles avec les valeurs fondamentales d'une société.\n\nCette réflexion nous amène à reconsidérer notre compréhension de ce que signifie être juste, dépassant la simple observance des lois pour une approche plus holistique qui prend en compte les complexités éthiques et sociales.",
+    "concepts_detected": [
+      "ÊTRE"
+    ],
+    "confidence": 0.8219904761904762,
+    "validation_score": 0.7691428571428572,
+    "feedback_score": null,
+    "timestamp": "2025-06-09T18:35:38.373284",
+    "interaction_id": "interaction_373284",
+    "context_metadata": {
+      "extraction_method": "llm_ultra_advanced",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 1,
+      "constraint_violations": 0,
+      "response_length": 2049,
+      "processing_time": 18.013214111328125
+    }
+  },
+  {
+    "question": "peut-on être juste en désobéissant aux lois ?",
+    "response": "Intéressante question qui soulève des interrogations fondamentales sur la justice, les lois et l'existence elle-même. Laissez-moi tenter d'éclairer ce débat.\n\nPuisqu'on est à la recherche de réponses s'appuyant sur le concept d'être (ÊTRE), il convient de préciser que par être, nous entendons toute entité susceptible d'exister. Cela englobe non seulement les individus mais également les communautés, les institutions et même les idées qui influencent notre perception du monde.\n\nOr, lorsqu'on envisage la possibilité de désobéir aux lois, on se pose inévitablement la question : que signifie être juste dans ce contexte ? La justice est souvent associée à l'observation des règles et lois établies par les sociétés humaines. Cependant, cette approche peut être limitante.\n\nPensons-y. Les lois sont créées pour maintenir l'ordre social, protéger les droits individuels et promouvoir le bien commun. Pourtant, dans certaines situations, les lois peuvent devenir injustes ou inadaptées aux changements sociétaux. Lorsque cela se produit, désobéir à ces lois peut être considéré comme un acte juste s'il vise à rectifier des injustices ou à promouvoir le bien-être général.\n\nConsidérons les exemples historiques de résistances pacifiques ou de mouvements de liberté qui ont défié les lois oppressives. Ces actions, même s'elles impliquaient la désobéissance aux règles établies, ont souvent contribué à l'avancement de la justice et des droits humains.\n\nPar conséquent, on peut soutenir que, dans certains cas, être juste peut prendre la forme de désobéir aux lois. Cela nécessite une compréhension nuancée du contexte social et politique, ainsi qu'une volonté de remettre en question les règles existantes lorsqu'elles sont perçues comme contraires à l'éthique ou incompatibles avec les valeurs fondamentales d'une société.\n\nCette réflexion nous amène à reconsidérer notre compréhension de ce que signifie être juste, dépassant la simple observance des lois pour une approche plus holistique qui prend en compte les complexités éthiques et sociales.",
+    "concepts_detected": [
+      "ÊTRE"
+    ],
+    "confidence": 0.8219904761904762,
+    "validation_score": 0.7691428571428572,
+    "feedback_score": null,
+    "timestamp": "2025-06-09T18:35:38.379790",
+    "interaction_id": "interaction_379790",
+    "context_metadata": {
+      "extraction_method": "llm_ultra_advanced",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 2049,
+      "processing_time": 2.0
+    }
+  },
+  {
+    "question": "Que signifie être dans ce contexte ?",
+    "response": "[1a] Sont dits homonymes les objets dont le nom seul est commun, alors que l'énonciation1 correspondant à ce nom est différente. C'est ainsi que l'homme et la figure dessinée sont animal2 : en effet, ces objets ont seulement le nom en commun, alors que l'énonciation correspondant à ce nom est différente. Car si [5] on doit rendre compte de ce que c'est, pour chacun d'eux, que d'être un animal, on répondra par une énonciation propre à chacun.",
+    "concepts_detected": [
+      "être",
+      "effet",
+      "courage",
+      "certain",
+      "savoir"
+    ],
+    "confidence": 0.7,
+    "validation_score": 0.8,
+    "feedback_score": 0.8,
+    "timestamp": "2025-06-09T18:38:08.598097",
+    "interaction_id": "interaction_598097",
+    "context_metadata": {
+      "extraction_method": "training_generated",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 445,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Que signifie être dans ce contexte ?",
+    "response": "Sont dits synonymes les objets dont le nom est commun, et pour lesquels l'énonciation correspondant à ce nom est la même. C'est ainsi que l'homme et le bœuf sont animal. En effet, chacun d'eux est appelé animal, d'un nom qui leur est commun, et l'énonciation [10] est la même. Car si on doit donner l'énonciation de chacun d'eux, dire ce que c'est, pour chacun, que d'être un animal, on répondra par la même énonciation.",
+    "concepts_detected": [
+      "être",
+      "effet"
+    ],
+    "confidence": 0.7,
+    "validation_score": 0.8,
+    "feedback_score": 0.8,
+    "timestamp": "2025-06-09T18:38:08.600103",
+    "interaction_id": "interaction_600103",
+    "context_metadata": {
+      "extraction_method": "training_generated",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 420,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Que signifie courage dans ce contexte ?",
+    "response": "Par ailleurs, sont dits paronymes tous les objets qui tiennent leur appellation d'un certain objet, alors qu'ils en diffèrent par la dérivation. Par exemple, le lettré d'après les lettres, et le [15] courageux d'après le courage.",
+    "concepts_detected": [
+      "courage",
+      "certain"
+    ],
+    "confidence": 0.7,
+    "validation_score": 0.8,
+    "feedback_score": 0.8,
+    "timestamp": "2025-06-09T18:38:08.601100",
+    "interaction_id": "interaction_601100",
+    "context_metadata": {
+      "extraction_method": "training_generated",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 229,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Que signifie certain dans ce contexte ?",
+    "response": "[20] Parmi les étants, les uns se disent d'un certain sujet, mais ne sont dans aucun sujet ; par exemple, homme se dit d'un sujet, tel homme, mais n'est dans aucun sujet.",
+    "concepts_detected": [
+      "certain"
+    ],
+    "confidence": 0.7,
+    "validation_score": 0.8,
+    "feedback_score": 0.8,
+    "timestamp": "2025-06-09T18:38:08.604599",
+    "interaction_id": "interaction_604599",
+    "context_metadata": {
+      "extraction_method": "training_generated",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 170,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Que signifie être dans ce contexte ?",
+    "response": "D'autres, en revanche, sont dans un sujet, mais ne se disent d'aucun sujet (par « dans un sujet », j'entends ce qui, tout en n'étant pas dans quelque chose à la façon d'une partie, [25] est incapable d'être à part de ce en quoi il est).",
+    "concepts_detected": [
+      "être"
+    ],
+    "confidence": 0.7,
+    "validation_score": 0.8,
+    "feedback_score": 0.8,
+    "timestamp": "2025-06-09T18:38:08.605598",
+    "interaction_id": "interaction_605598",
+    "context_metadata": {
+      "extraction_method": "training_generated",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 236,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Que signifie savoir dans ce contexte ?",
+    "response": "Par exemple, tel savoir-lire particulier est dans un sujet, l'âme, mais ne se dit d'aucun sujet ; et tel blanc particulier est dans un sujet, le corps – car toute couleur est dans un corps –, mais ne se dit d'aucun sujet. D'autres à la fois se disent d'un sujet et [1b] sont dans un sujet : par exemple le savoir est dans un sujet, l'âme, et il se dit d'un sujet, le fait de savoir lire.",
+    "concepts_detected": [
+      "savoir",
+      "savoir",
+      "savoir"
+    ],
+    "confidence": 0.7,
+    "validation_score": 0.8,
+    "feedback_score": 0.8,
+    "timestamp": "2025-06-09T18:38:08.607098",
+    "interaction_id": "interaction_607098",
+    "context_metadata": {
+      "extraction_method": "training_generated",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 387,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Que signifie effet dans ce contexte ?",
+    "response": "D'autres à la fois ne sont pas dans un sujet et ne se disent pas d'un sujet, par exemple tel homme ou tel [5] cheval. En effet, aucun objet de cette sorte n'est dans un sujet ni ne se dit d'un sujet. En bref, les objets qui sont individuels, c'est-à-dire numériquement uns, ne se disent d'aucun sujet, mais rien n'empêche que certains d'entre eux soient dans un sujet.",
+    "concepts_detected": [
+      "effet"
+    ],
+    "confidence": 0.7,
+    "validation_score": 0.8,
+    "feedback_score": 0.8,
+    "timestamp": "2025-06-09T18:38:08.609098",
+    "interaction_id": "interaction_609098",
+    "context_metadata": {
+      "extraction_method": "training_generated",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 368,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Que signifie effet dans ce contexte ?",
+    "response": "En effet, tel savoir-lire particulier fait partie des choses qui sont dans un sujet..",
+    "concepts_detected": [
+      "effet",
+      "savoir"
+    ],
+    "confidence": 0.7,
+    "validation_score": 0.8,
+    "feedback_score": 0.8,
+    "timestamp": "2025-06-09T18:38:08.609596",
+    "interaction_id": "interaction_609596",
+    "context_metadata": {
+      "extraction_method": "training_generated",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 85,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Que signifie être dans ce contexte ?",
+    "response": "[1a] Sont dits homonymes les objets dont le nom seul est commun, alors que l'énonciation1 correspondant à ce nom est différente. C'est ainsi que l'homme et la figure dessinée sont animal2 : en effet, ces objets ont seulement le nom en commun, alors que l'énonciation correspondant à ce nom est différente. Car si [5] on doit rendre compte de ce que c'est, pour chacun d'eux, que d'être un animal, on répondra par une énonciation propre à chacun.",
+    "concepts_detected": [
+      "être",
+      "effet"
+    ],
+    "confidence": 0.7,
+    "validation_score": 0.8,
+    "feedback_score": 0.8,
+    "timestamp": "2025-06-09T18:42:02.416513",
+    "interaction_id": "interaction_416513",
+    "context_metadata": {
+      "extraction_method": "training_generated",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 445,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Que signifie être dans ce contexte ?",
+    "response": "Sont dits synonymes les objets dont le nom est commun, et pour lesquels l'énonciation correspondant à ce nom est la même. C'est ainsi que l'homme et le bœuf sont animal. En effet, chacun d'eux est appelé animal, d'un nom qui leur est commun, et l'énonciation [10] est la même. Car si on doit donner l'énonciation de chacun d'eux, dire ce que c'est, pour chacun, que d'être un animal, on répondra par la même énonciation.",
+    "concepts_detected": [
+      "être",
+      "effet"
+    ],
+    "confidence": 0.7,
+    "validation_score": 0.8,
+    "feedback_score": 0.8,
+    "timestamp": "2025-06-09T18:42:02.418012",
+    "interaction_id": "interaction_418012",
+    "context_metadata": {
+      "extraction_method": "training_generated",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 420,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Que signifie courage dans ce contexte ?",
+    "response": "Par ailleurs, sont dits paronymes tous les objets qui tiennent leur appellation d'un certain objet, alors qu'ils en diffèrent par la dérivation. Par exemple, le lettré d'après les lettres, et le [15] courageux d'après le courage.",
+    "concepts_detected": [
+      "courage",
+      "certain"
+    ],
+    "confidence": 0.7,
+    "validation_score": 0.8,
+    "feedback_score": 0.8,
+    "timestamp": "2025-06-09T18:42:02.419515",
+    "interaction_id": "interaction_419515",
+    "context_metadata": {
+      "extraction_method": "training_generated",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 229,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Que signifie certain dans ce contexte ?",
+    "response": "[20] Parmi les étants, les uns se disent d'un certain sujet, mais ne sont dans aucun sujet ; par exemple, homme se dit d'un sujet, tel homme, mais n'est dans aucun sujet.",
+    "concepts_detected": [
+      "certain"
+    ],
+    "confidence": 0.7,
+    "validation_score": 0.8,
+    "feedback_score": 0.8,
+    "timestamp": "2025-06-09T18:42:02.422514",
+    "interaction_id": "interaction_422514",
+    "context_metadata": {
+      "extraction_method": "training_generated",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 170,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Que signifie être dans ce contexte ?",
+    "response": "D'autres, en revanche, sont dans un sujet, mais ne se disent d'aucun sujet (par « dans un sujet », j'entends ce qui, tout en n'étant pas dans quelque chose à la façon d'une partie, [25] est incapable d'être à part de ce en quoi il est).",
+    "concepts_detected": [
+      "être"
+    ],
+    "confidence": 0.7,
+    "validation_score": 0.8,
+    "feedback_score": 0.8,
+    "timestamp": "2025-06-09T18:42:02.423513",
+    "interaction_id": "interaction_423513",
+    "context_metadata": {
+      "extraction_method": "training_generated",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 236,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Que signifie savoir dans ce contexte ?",
+    "response": "Par exemple, tel savoir-lire particulier est dans un sujet, l'âme, mais ne se dit d'aucun sujet ; et tel blanc particulier est dans un sujet, le corps – car toute couleur est dans un corps –, mais ne se dit d'aucun sujet. D'autres à la fois se disent d'un sujet et [1b] sont dans un sujet : par exemple le savoir est dans un sujet, l'âme, et il se dit d'un sujet, le fait de savoir lire.",
+    "concepts_detected": [
+      "savoir",
+      "savoir",
+      "savoir"
+    ],
+    "confidence": 0.7,
+    "validation_score": 0.8,
+    "feedback_score": 0.8,
+    "timestamp": "2025-06-09T18:42:02.425513",
+    "interaction_id": "interaction_425513",
+    "context_metadata": {
+      "extraction_method": "training_generated",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 387,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Que signifie effet dans ce contexte ?",
+    "response": "D'autres à la fois ne sont pas dans un sujet et ne se disent pas d'un sujet, par exemple tel homme ou tel [5] cheval. En effet, aucun objet de cette sorte n'est dans un sujet ni ne se dit d'un sujet. En bref, les objets qui sont individuels, c'est-à-dire numériquement uns, ne se disent d'aucun sujet, mais rien n'empêche que certains d'entre eux soient dans un sujet.",
+    "concepts_detected": [
+      "effet"
+    ],
+    "confidence": 0.7,
+    "validation_score": 0.8,
+    "feedback_score": 0.8,
+    "timestamp": "2025-06-09T18:42:02.427515",
+    "interaction_id": "interaction_427515",
+    "context_metadata": {
+      "extraction_method": "training_generated",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 368,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Que signifie effet dans ce contexte ?",
+    "response": "En effet, tel savoir-lire particulier fait partie des choses qui sont dans un sujet..",
+    "concepts_detected": [
+      "effet",
+      "savoir"
+    ],
+    "confidence": 0.7,
+    "validation_score": 0.8,
+    "feedback_score": 0.8,
+    "timestamp": "2025-06-09T18:42:02.428015",
+    "interaction_id": "interaction_428015",
+    "context_metadata": {
+      "extraction_method": "training_generated",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 85,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Que signifie effet dans ce contexte ?",
+    "response": "Lorsque des genres sont distincts2 et ne sont pas subordonnés les uns aux autres, leurs différences non plus ne sont pas de même forme. C'est le cas pour les différences de l'animal et celles de la science. En effet, les différences de l'animal sont pédestre, bipède, ailé, aquatique ; mais aucune de ces choses n'est une différence de la science.",
+    "concepts_detected": [
+      "effet",
+      "différence",
+      "forme"
+    ],
+    "confidence": 0.7,
+    "validation_score": 0.8,
+    "feedback_score": 0.8,
+    "timestamp": "2025-06-09T18:42:02.431021",
+    "interaction_id": "interaction_431022",
+    "context_metadata": {
+      "extraction_method": "training_generated",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 347,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Que signifie être dans ce contexte ?",
+    "response": "Car [20] une science ne diffère pas d'une autre par le fait d'être bipède. Mais lorsque des genres sont subordonnés les uns aux autres, rien n'empêche qu'ils aient les mêmes différences. En effet, les genres supérieurs s'appliquent aux genres qui sont placés au-dessous d'eux, de sorte que, autant il y aura de différences du terme appliqué, autant il y en aura du sujet..",
+    "concepts_detected": [
+      "être",
+      "effet"
+    ],
+    "confidence": 0.7,
+    "validation_score": 0.8,
+    "feedback_score": 0.8,
+    "timestamp": "2025-06-09T18:42:02.432521",
+    "interaction_id": "interaction_432522",
+    "context_metadata": {
+      "extraction_method": "training_generated",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 372,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Analysez ce passage philosophique.",
+    "response": "[1a] Sont dits homonymes les objets dont le nom seul est commun, alors que l'énonciation1 correspondant à ce nom est différente. C'est ainsi que l'homme et la figure dessinée sont animal2 : en effet, ...",
+    "concepts_detected": [
+      "MAL",
+      "ÊTRE",
+      "CONNAISSANCE",
+      "ÂME",
+      "SCIENCE",
+      "VÉRITÉ",
+      "BIEN"
+    ],
+    "confidence": 0.6,
+    "validation_score": 0.7,
+    "feedback_score": 0.7,
+    "timestamp": "2025-06-09T18:45:45.111323",
+    "interaction_id": "interaction_111323",
+    "context_metadata": {
+      "extraction_method": "ultra_safe",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 203,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Analysez ce passage philosophique.",
+    "response": "Sont dits synonymes les objets dont le nom est commun, et pour lesquels l'énonciation correspondant à ce nom est la même. C'est ainsi que l'homme et le bœuf sont animal. En effet, chacun d'eux est app...",
+    "concepts_detected": [
+      "MAL",
+      "ÊTRE"
+    ],
+    "confidence": 0.6,
+    "validation_score": 0.7,
+    "feedback_score": 0.7,
+    "timestamp": "2025-06-09T18:45:45.111766",
+    "interaction_id": "interaction_111766",
+    "context_metadata": {
+      "extraction_method": "ultra_safe",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 203,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Analysez ce passage philosophique.",
+    "response": "[20] Parmi les étants, les uns se disent d'un certain sujet, mais ne sont dans aucun sujet ; par exemple, homme se dit d'un sujet, tel homme, mais n'est dans aucun sujet. D'autres, en revanche, sont d...",
+    "concepts_detected": [
+      "ÊTRE",
+      "CONNAISSANCE",
+      "ÂME"
+    ],
+    "confidence": 0.6,
+    "validation_score": 0.7,
+    "feedback_score": 0.7,
+    "timestamp": "2025-06-09T18:45:45.111766",
+    "interaction_id": "interaction_111766",
+    "context_metadata": {
+      "extraction_method": "ultra_safe",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 203,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Analysez ce passage philosophique.",
+    "response": "[10] Lorsqu'un terme s'applique1 à un autre comme à un sujet, alors tout ce qui se dit du terme qui s'applique au sujet se dira également du sujet. Par exemple, homme s'applique à tel homme, et animal...",
+    "concepts_detected": [
+      "MAL"
+    ],
+    "confidence": 0.6,
+    "validation_score": 0.7,
+    "feedback_score": 0.7,
+    "timestamp": "2025-06-09T18:45:45.111766",
+    "interaction_id": "interaction_111766",
+    "context_metadata": {
+      "extraction_method": "ultra_safe",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 203,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Analysez ce passage philosophique.",
+    "response": "Lorsque des genres sont distincts2 et ne sont pas subordonnés les uns aux autres, leurs différences non plus ne sont pas de même forme. C'est le cas pour les différences de l'animal et celles de la sc...",
+    "concepts_detected": [
+      "MAL",
+      "ÊTRE",
+      "SCIENCE"
+    ],
+    "confidence": 0.6,
+    "validation_score": 0.7,
+    "feedback_score": 0.7,
+    "timestamp": "2025-06-09T18:45:45.112267",
+    "interaction_id": "interaction_112267",
+    "context_metadata": {
+      "extraction_method": "ultra_safe",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 203,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Analysez ce passage philosophique.",
+    "response": "[25] Chacun des termes qui sont dits sans aucune combinaison indique soit une substance, soit une certaine quantité, soit une certaine qualité, soit un rapport à quelque chose, soit quelque part, soit...",
+    "concepts_detected": [
+      "ÊTRE"
+    ],
+    "confidence": 0.6,
+    "validation_score": 0.7,
+    "feedback_score": 0.7,
+    "timestamp": "2025-06-09T18:45:45.112267",
+    "interaction_id": "interaction_112267",
+    "context_metadata": {
+      "extraction_method": "ultra_safe",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 203,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Analysez ce passage philosophique.",
+    "response": "[5] Chacun des termes que l'on vient de dire, considéré lui-même par lui-même, n'est pas dit dans une affirmation, mais l'affirmation naît de la combinaison de ces termes les uns avec les autres. En e...",
+    "concepts_detected": [
+      "VÉRITÉ"
+    ],
+    "confidence": 0.6,
+    "validation_score": 0.7,
+    "feedback_score": 0.7,
+    "timestamp": "2025-06-09T18:45:45.112267",
+    "interaction_id": "interaction_112267",
+    "context_metadata": {
+      "extraction_method": "ultra_safe",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 203,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Analysez ce passage philosophique.",
+    "response": "Mais se disent par ailleurs une seconde <sorte de> substances, les espèces auxquelles [15] appartiennent les substances dites au sens premier – celles-là, et aussi les genres de ces espèces. Par exemp...",
+    "concepts_detected": [
+      "MAL",
+      "CONNAISSANCE"
+    ],
+    "confidence": 0.6,
+    "validation_score": 0.7,
+    "feedback_score": 0.7,
+    "timestamp": "2025-06-09T18:45:45.112267",
+    "interaction_id": "interaction_112267",
+    "context_metadata": {
+      "extraction_method": "ultra_safe",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 203,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Analysez ce passage philosophique.",
+    "response": "(On voit, d'après ce qu'on a dit, que [20] nécessairement, et le nom et l'énonciation de ce qui se dit d'un sujet s'appliquent à ce sujet. Par exemple, homme se dit d'un sujet, tel homme, et ce nom, b...",
+    "concepts_detected": [
+      "BIEN"
+    ],
+    "confidence": 0.6,
+    "validation_score": 0.7,
+    "feedback_score": 0.7,
+    "timestamp": "2025-06-09T18:45:45.112267",
+    "interaction_id": "interaction_112267",
+    "context_metadata": {
+      "extraction_method": "ultra_safe",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 203,
+      "processing_time": 1.0
+    }
+  },
+  {
+    "question": "Analysez ce passage philosophique.",
+    "response": "Tous les autres termes, ou bien se disent de sujets [35] qui sont les substances premières, ou bien sont dans des sujets qui sont ces mêmes substances. Cela apparaîtra clairement en partant des cas pa...",
+    "concepts_detected": [
+      "BIEN",
+      "MAL"
+    ],
+    "confidence": 0.6,
+    "validation_score": 0.7,
+    "feedback_score": 0.7,
+    "timestamp": "2025-06-09T18:45:45.112765",
+    "interaction_id": "interaction_112765",
+    "context_metadata": {
+      "extraction_method": "ultra_safe",
+      "relations_found": 0,
+      "lcm_reasoning_paths": 0,
+      "constraint_violations": 0,
+      "response_length": 203,
+      "processing_time": 1.0
+    }
+  }
+]
