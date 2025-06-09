@@ -1,0 +1,2 @@
+# SophIA
+SophIA - un LCM
