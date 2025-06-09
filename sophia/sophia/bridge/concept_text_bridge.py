@@ -8,6 +8,7 @@ from typing import Dict, List, Tuple, Any, Optional
 from dataclasses import dataclass
 import logging
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +26,10 @@ class EnhancedConceptTextBridge:
     """
     Pont amélioré entre concepts ontologiques et texte naturel
     Utilise Ollama pour améliorer l'analyse contextuelle
+    Parallélisation multithread pour accélérer les appels Ollama
     """
     
-    def __init__(self, ontology, llm_interface):
+    def __init__(self, ontology, llm_interface, max_workers: int = 4):
         logger.info("Initialisation de EnhancedConceptTextBridge")
         self.ontology = ontology
         self.llm = llm_interface
@@ -36,22 +38,37 @@ class EnhancedConceptTextBridge:
         # Cache pour éviter les requêtes répétées - INITIALISE EN PREMIER
         self._synonyms_cache = {}
         self._context_cache = {}
+        self.max_workers = max_workers
         
         logger.debug("Construction des patterns de concepts...")
         self.concept_patterns = self._build_concept_patterns()
         logger.info(f"Patterns de concepts construits: {self.concept_patterns}")
         
     def _build_concept_patterns(self) -> Dict[str, List[str]]:
-        """Construit des patterns de reconnaissance pour chaque concept"""
+        """Construit des patterns de reconnaissance pour chaque concept (parallélisé pour les synonymes)"""
         patterns = {}
         logger.debug("Début de la construction des patterns pour chaque concept.")
-        for concept_name, concept in self.ontology.concepts.items():
-            logger.debug(f"Construction des patterns pour le concept: {concept_name}")
+        concept_names = list(self.ontology.concepts.keys())
+        # Parallélisation pour la génération des synonymes
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            future_to_concept = {
+                executor.submit(self._get_concept_synonyms, concept_name): concept_name
+                for concept_name in concept_names
+            }
+            synonyms_results = {}
+            for future in as_completed(future_to_concept):
+                concept_name = future_to_concept[future]
+                try:
+                    synonyms_results[concept_name] = future.result()
+                except Exception as exc:
+                    logger.warning(f"Erreur lors de la génération des synonymes pour {concept_name}: {exc}")
+                    synonyms_results[concept_name] = []
+        for concept_name in concept_names:
             patterns[concept_name] = [
                 concept_name.lower(),
                 concept_name.replace('_', ' ').lower(),
                 concept_name.replace('_', '-').lower(),
-                *self._get_concept_synonyms(concept_name)
+                *synonyms_results.get(concept_name, [])
             ]
             logger.debug(f"Patterns pour {concept_name}: {patterns[concept_name]}")
         logger.debug("Fin de la construction des patterns.")
@@ -350,18 +367,31 @@ Analyse:"""
         return final_score
     
     def _build_detailed_concepts(self, matches: List[ConceptMatch]) -> Dict[str, Dict]:
-        """Construit une analyse détaillée des concepts"""
+        """Construit une analyse détaillée des concepts (parallélisé pour l'analyse contextuelle)"""
         logger.debug("Construction de l'analyse détaillée des concepts.")
         detailed = {}
+        # Parallélisation pour l'analyse contextuelle
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            future_to_match = {
+                executor.submit(self._analyze_concept_context, match): match
+                for match in matches
+            }
+            context_results = {}
+            for future in as_completed(future_to_match):
+                match = future_to_match[future]
+                try:
+                    context_results[match] = future.result()
+                except Exception as exc:
+                    logger.warning(f"Erreur analyse contextuelle pour {match.concept}: {exc}")
+                    context_results[match] = {}
         for match in matches:
             if match.concept not in detailed:
                 logger.debug(f"Ajout du concept {match.concept} à l'analyse détaillée.")
                 detailed[match.concept] = {
                     'confidence': match.confidence,
                     'occurrences': [],
-                    'context_analysis': self._analyze_concept_context(match)
+                    'context_analysis': context_results.get(match, {})
                 }
-            
             detailed[match.concept]['occurrences'].append({
                 'text': match.text_span,
                 'position': match.position,
