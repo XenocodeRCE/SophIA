@@ -1,1 +1,6 @@
-# lcm_core.py
+"""
+Modèle LCM de base - À implémenter
+"""
+
+# TODO: Implémenter SimpleLCM
+pass

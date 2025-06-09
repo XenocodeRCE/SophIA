@@ -1,1 +1,6 @@
-# sophia_hybrid.py
+"""
+Système hybride SophIA - À implémenter
+"""
+
+# TODO: Implémenter HybridSophIA
+pass
