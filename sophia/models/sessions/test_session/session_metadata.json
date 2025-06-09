@@ -1,0 +1,25 @@
+{
+  "session_name": "test_session",
+  "created": "2025-06-09T12:43:37.135470",
+  "last_updated": "2025-06-09T12:43:37.135470",
+  "checkpoints_history": [
+    {
+      "epoch": 1,
+      "filepath": "models\\sessions\\test_session\\checkpoint_epoch_0001_20250609_124337.sophia",
+      "timestamp": "2025-06-09T12:43:37.112443",
+      "metrics": {
+        "loss": 0.5,
+        "coherence": 0.8
+      }
+    },
+    {
+      "epoch": 2,
+      "filepath": "models\\sessions\\test_session\\checkpoint_epoch_0002_20250609_124337.sophia",
+      "timestamp": "2025-06-09T12:43:37.125970",
+      "metrics": {
+        "loss": 0.3,
+        "coherence": 0.9
+      }
+    }
+  ]
+}
