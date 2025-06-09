@@ -138,6 +138,7 @@ class SimpleLCM:
         """Génère une séquence de concepts à partir d'un concept de départ"""
         
         start_name = start_concept.upper().strip()
+        logger.info(f"Début de génération de séquence depuis {start_name} (longueur={length}, température={temperature})")
         
         if start_name not in self.ontology.concepts:
             logger.error(f"Concept de départ {start_name} n'existe pas")
@@ -147,34 +148,43 @@ class SimpleLCM:
         current_concept = start_name
         
         for step in range(length - 1):
+            logger.debug(f"Étape {step+1}/{length-1} - concept courant: {current_concept}")
             next_candidates = self.get_next_concepts(current_concept, top_k=10)
+            logger.debug(f"Transitions probabilistes trouvées: {next_candidates}")
             
             if not next_candidates:
+                logger.info(f"Aucune transition probabiliste trouvée depuis {current_concept}, fallback sur ontologie")
                 # Aucune transition disponible, utiliser les relations ontologiques
                 next_candidates = self._get_ontological_next_concepts(current_concept)
+                logger.debug(f"Transitions ontologiques candidates: {next_candidates}")
             
             if not next_candidates:
-                logger.warning(f"Aucune transition disponible depuis {current_concept}")
+                logger.warning(f"Aucune transition disponible depuis {current_concept}, arrêt de la séquence")
                 break
             
             # Sélection avec température
             next_concept = self._sample_with_temperature(next_candidates, temperature)
+            logger.debug(f"Concept sélectionné: {next_concept}")
             
             if next_concept in [c.name for c in sequence]:
-                # Éviter les cycles courts
+                logger.info(f"Cycle détecté avec {next_concept}, on saute ce concept")
                 continue
             
             sequence.append(self.ontology.concepts[next_concept])
+            logger.info(f"Ajout du concept {next_concept} à la séquence")
             current_concept = next_concept
         
-        logger.debug(f"Séquence générée: {[c.name for c in sequence]}")
+        logger.info(f"Séquence générée: {[c.name for c in sequence]}")
+        logger.debug(f"Séquence complète: {[c for c in sequence]}")
         return sequence
     
     def _get_ontological_next_concepts(self, concept_name: str) -> List[Tuple[str, float]]:
         """Utilise les relations ontologiques comme fallback pour les transitions"""
         
+        logger.debug(f"Recherche des transitions ontologiques pour {concept_name}")
         concept = self.ontology.get_concept(concept_name)
         if not concept:
+            logger.warning(f"Concept {concept_name} introuvable dans l'ontologie pour fallback")
             return []
         
         candidates = []
