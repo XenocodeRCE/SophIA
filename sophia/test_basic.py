@@ -9,6 +9,7 @@ import os
 # Ajouter le dossier sophia au path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 
+from sophia.models.lcm_core import SimpleLCM
 from sophia.core.ontology import SimpleOntology, Concept
 from sophia.core.concept_types import ConceptType, RelationType
 
@@ -54,5 +55,34 @@ def test_ontology_basic():
     print("\n🎉 Tous les tests sont passés !")
     return True
 
+# Ajoute cette fonction de test
+def test_lcm_basic():
+    print("\n=== Test LCM de base ===")
+    
+    # Création ontologie et LCM
+    ontology = SimpleOntology()
+    lcm = SimpleLCM(ontology)
+    
+    print(f"1. LCM créé avec {len(ontology.concepts)} concepts")
+    
+    # Test ajout transitions manuelles
+    lcm.add_transition("VÉRITÉ", "CONNAISSANCE", 0.8)
+    lcm.add_transition("CONNAISSANCE", "ÊTRE", 0.7)
+    lcm.add_transition("ÊTRE", "EXISTENCE", 0.9)
+    
+    print("2. Transitions ajoutées")
+    print(f"   Total transitions: {len(lcm.transitions)}")
+    
+    # Test génération séquence
+    sequence = lcm.generate_sequence("VÉRITÉ", length=4)
+    print(f"3. Séquence générée: {[c.name for c in sequence]}")
+    
+    # Test statistiques
+    stats = lcm.get_model_stats()
+    print(f"4. Stats LCM: {stats}")
+    
+    return True
+
 if __name__ == "__main__":
     test_ontology_basic()
+    test_lcm_basic()
