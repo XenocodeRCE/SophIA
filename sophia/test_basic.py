@@ -16,7 +16,7 @@ from sophia.training.trainer import SimpleLCMTrainer, OntologyAwareLCMTrainer
 # Ajoute ces imports
 from sophia.storage.serializer import LCMSerializer
 from sophia.storage.session import TrainingSession
-from sophia.llm.llama_interface import LLaMAInterface
+from sophia.llm.llama_interface import OllamaLLaMAInterface
 
 
 def test_ontology_basic():
@@ -194,57 +194,66 @@ def test_save_load_system():
     
     return True
 
-def test_llama_interface():
-    print("\n=== Test Interface LLaMA ===")
+def test_ollama_llama():
+    print("\n=== Test Ollama + LLaMA 3.1 ===")
     
-    # Initialisation de l'interface (peut prendre du temps au premier chargement)
-    print("1. Initialisation LLaMA (peut prendre quelques minutes)...")
-    llama = LLaMAInterface()
+    # Test avec ton setup Ollama
+    print("1. Connexion à Ollama...")
+    llama = OllamaLLaMAInterface(model_name="llama3.1:latest")
     
-    # Info sur le modèle
+    # Vérification disponibilité
     model_info = llama.get_model_info()
-    print(f"2. Modèle chargé: {model_info['status']}")
-    print(f"   Nom: {model_info['model_name']}")
-    print(f"   Paramètres: {model_info.get('parameters', 0):,}")
+    print(f"   Status: {model_info['status']}")
+    print(f"   Modèle: {model_info['model_name']}")
     
-    # Test génération simple
-    print("3. Test génération de texte...")
-    prompt = "Qu'est-ce que la vérité en philosophie ?"
-    response = llama.generate_text(prompt, max_tokens=100)
+    if model_info['status'] != 'ready':
+        print("⚠️ Ollama ou LLaMA 3.1 non disponible, vérifiez qu'Ollama tourne")
+        return False
+    
+    # Test génération philosophique
+    print("2. Test génération philosophique...")
+    prompt = "Selon toi, quelle est la relation entre vérité et connaissance ?"
+    response = llama.generate_text(prompt, max_tokens=150)
     print(f"   Prompt: {prompt}")
-    print(f"   Réponse: {response[:200]}...")
+    print(f"   LLaMA 3.1: {response}")
     
-    # Test extraction de concepts
-    print("4. Test extraction de concepts...")
+    # Test extraction conceptuelle
+    print("3. Test extraction avec LLaMA 3.1...")
     ontology = SimpleOntology()
-    available_concepts = list(ontology.concepts.keys())
     
-    text = "La vérité est liée à la connaissance et à l'être"
-    extraction = llama.extract_concepts_from_text(text, available_concepts)
-    print(f"   Texte: {text}")
+    philosophical_text = """
+    La vérité platonicienne transcende le sensible. Cette conception implique que la 
+    connaissance authentique ne peut être atteinte que par la raison, car l'être 
+    véritable réside dans le monde intelligible. La justice, en tant qu'idée, 
+    participe de cette réalité supérieure.
+    """
+    
+    extraction = llama.extract_concepts_from_text(philosophical_text, list(ontology.concepts.keys()))
     print(f"   Concepts extraits: {extraction['concepts_detected']}")
+    print(f"   Relations détectées: {len(extraction['relations_implied'])}")
     print(f"   Confiance: {extraction['confidence']}")
     
-    # Test génération avec contraintes
-    print("5. Test génération contrainte...")
+    # Test génération contrainte
+    print("4. Test génération avec contraintes...")
     constraints = {
-        'required_concepts': ['VÉRITÉ', 'CONNAISSANCE'],
-        'max_tokens': 80
+        'required_concepts': ['VÉRITÉ', 'CONNAISSANCE', 'ÊTRE'],
+        'forbidden_concepts': ['MAL'],
+        'tone': 'académique et précis'
     }
     
-    constrained_response = llama.generate_with_constraints(
-        "Explique la relation entre vérité et connaissance", 
-        constraints
-    )
+    constrained_prompt = "Explique la philosophie de Platon en 100 mots"
+    result = llama.generate_with_constraints(constrained_prompt, constraints)
     
-    print(f"   Contraintes satisfaites: {constrained_response['constraints_satisfied']}")
-    print(f"   Réponse: {constrained_response['text'][:150]}...")
+    print(f"   Contraintes respectées: {result['constraints_satisfied']}")
+    print(f"   Tentatives: {result['attempt']}")
+    print(f"   Réponse: {result['text'][:200]}...")
     
     return True
+
 
 if __name__ == "__main__":
     test_ontology_basic()
     test_lcm_basic()
     test_training_system()
     test_save_load_system()
-    test_llama_interface()
+    test_ollama_llama()
