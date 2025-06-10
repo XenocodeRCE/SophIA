@@ -464,7 +464,12 @@ class PhilosophicalConstraintManager:
                 total_weight += constraint.weight
                 
                 if constraint.mandatory and score < 0.6:
-                    logger.warning(f"Violation de contrainte obligatoire: {constraint.name} (score: {score})")
+                    logger.warning(
+                        f"🚨 Violation de contrainte obligatoire: '{constraint.name}' (score: {score:.2f}) "
+                        f"→ Description: {constraint.description} | "
+                        f"Contexte: {context} | "
+                        f"Réponse: {response[:120]}{'...' if len(response) > 120 else ''}"
+                    )
                     violations.append({
                         'constraint': constraint.name,
                         'score': score,

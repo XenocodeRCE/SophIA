@@ -28,6 +28,8 @@ class ConceptTextBridge:
         print("DEBUG: ConceptTextBridge: Chargement du cache...")
         self._cache = self._load_cache()
         print(f"DEBUG: ConceptTextBridge: Cache chargé: {bool(self._cache)}")
+        print(f"Contenu du cache: [{self._cache}]")
+        # Verrou pour la gestion du cache
         
         self._cache_lock = threading.Lock()
         

@@ -146,20 +146,28 @@ class SimpleLCM:
         
         sequence = [self.ontology.concepts[start_name]]
         current_concept = start_name
-        
+
+        # Pour le dessin de la séquence
+        sequence_path = [start_name]
+
         for step in range(length - 1):
             logger.debug(f"Étape {step+1}/{length-1} - concept courant: {current_concept}")
             next_candidates = self.get_next_concepts(current_concept, top_k=10)
             logger.debug(f"Transitions probabilistes trouvées: {next_candidates}")
             
             if not next_candidates:
-                logger.info(f"Aucune transition probabiliste trouvée depuis {current_concept}, fallback sur ontologie")
+                logger.info(f"[STOP] Aucune transition probabiliste trouvée depuis '{current_concept}'. Arrêt de la séquence à l'étape {step+1}/{length-1}.")
                 # Aucune transition disponible, utiliser les relations ontologiques
                 next_candidates = self._get_ontological_next_concepts(current_concept)
                 logger.debug(f"Transitions ontologiques candidates: {next_candidates}")
             
             if not next_candidates:
-                logger.warning(f"Aucune transition disponible depuis {current_concept}, arrêt de la séquence")
+                logger.warning(f"[STOP] Séquence interrompue : aucune transition (ni probabiliste ni ontologique) disponible depuis '{current_concept}'. Séquence générée jusqu'ici : {' -> '.join(sequence_path)}")
+                # Affichage visuel de la séquence
+                logger.info(f"🟢 Séquence générée : {' ➔ '.join(sequence_path)}")
+                #logger.info(f"Sequence générée (étape par étape) :")
+                #for idx, concept_name in enumerate(sequence_path):
+                #    logger.info(f"  Étape {idx+1}: {concept_name}")
                 break
             
             # Sélection avec température
@@ -171,10 +179,13 @@ class SimpleLCM:
                 continue
             
             sequence.append(self.ontology.concepts[next_concept])
+            sequence_path.append(next_concept)
             logger.info(f"Ajout du concept {next_concept} à la séquence")
+            # Affichage visuel de la séquence à chaque étape
+            logger.info(f"🟢 Séquence étape {step+2}: {' ➔ '.join(sequence_path)}")
             current_concept = next_concept
         
-        logger.info(f"Séquence générée: {[c.name for c in sequence]}")
+        logger.info(f"Séquence générée finale : {' ➔ '.join(sequence_path)}")
         logger.debug(f"Séquence complète: {[c for c in sequence]}")
         return sequence
     

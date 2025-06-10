@@ -1,19 +1,19 @@
 {
   "interactions_learned": 10,
-  "patterns_discovered": 6,
+  "patterns_discovered": 2,
   "adaptations_made": 0,
   "concept_improvements": {
-    "ÊTRE": 5,
-    "MAL": 5,
-    "CONNAISSANCE": 1,
-    "BIEN": 1
+    "CONNAISSANCE": 4,
+    "VÉRITÉ": 4,
+    "OPINION": 1,
+    "ART": 2,
+    "CONCEPT": 1
   },
   "domain_specializations": {
-    "ethics": 6,
-    "epistemology": 3,
-    "metaphysics": 1
+    "epistemology": 8,
+    "aesthetics": 2
   },
   "session_start": "2025-06-09T18:35:02.425836",
-  "total_interactions": 30,
+  "total_interactions": 90,
   "successful_adaptations": 0
 }

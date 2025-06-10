@@ -424,7 +424,10 @@ class HybridSophIA:
         cache_key = f"concept_extraction_{question_hash}"
         
         if hasattr(self, '_extraction_cache') and cache_key in self._extraction_cache:
-            logger.debug("🚀 Extraction concepts depuis cache")
+            logger.debug(f"🚀 Extraction concepts depuis cache pour la clé '{cache_key}'")
+            logger.debug(f"🔎 Taille du cache: {len(self._extraction_cache)}")
+            logger.debug(f"🔑 Clés présentes dans le cache: {list(self._extraction_cache.keys())[:5]}{' ...' if len(self._extraction_cache) > 5 else ''}")
+            logger.debug(f"✅ Concepts trouvés dans le cache: {self._extraction_cache[cache_key].get('concepts_detected', [])}")
             return self._extraction_cache[cache_key]
         
         # Initialise le cache si nécessaire
@@ -443,15 +446,19 @@ class HybridSophIA:
                     if hasattr(extractor, 'extract_concepts_fast'):
                         enhanced_extraction = extractor.extract_concepts_fast(question, max_concepts=4)
                         logger.debug(f"🚀 LLM Extractor TURBO utilisé")
+                        logger.debug(f"🧩 Résultat LLM Extractor TURBO: {enhanced_extraction}")
                     else:
                         enhanced_extraction = extractor.extract_concepts(question, max_concepts=4)
                         logger.debug(f"🚀 LLM Extractor standard utilisé")
+                        logger.debug(f"🧩 Résultat LLM Extractor standard: {enhanced_extraction}")
                 elif self.performance_mode == "quality":
                     enhanced_extraction = extractor.extract_concepts(question, max_concepts=8)
                     logger.debug(f"🎯 LLM Extractor QUALITY utilisé")
+                    logger.debug(f"🧩 Résultat LLM Extractor QUALITY: {enhanced_extraction}")
                 else:  # balanced
                     enhanced_extraction = extractor.extract_concepts(question, max_concepts=6)
                     logger.debug(f"⚖️ LLM Extractor BALANCED utilisé")
+                    logger.debug(f"🧩 Résultat LLM Extractor BALANCED: {enhanced_extraction}")
                     
             except Exception as e:
                 logger.warning(f"Erreur LLM Extractor: {e}")
